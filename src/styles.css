@@ -1,0 +1,13 @@
+/* Light theme (default) */
+body {
+  background-color: white;
+  color: black;
+}
+
+/* Dark theme */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #121212;
+    color: #e0e0e0;
+  }
+}
