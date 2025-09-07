@@ -8,17 +8,49 @@ export const startGame = (): void => {
   canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;
   ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-  gameLoopAnimId = requestAnimationFrame(gameLoop);
+  gameLoopAnimId = window.requestAnimationFrame(gameLoop);
+}
+
+const clearScreen = (): void => {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+};
+
+const drawBackground = (elapsedTime: number): void => {
+  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  gradient.addColorStop(0, `hsl(${(elapsedTime / 100) % 360}, 70%, 80%)`);
+  gradient.addColorStop(1, `hsl(${(elapsedTime / 100 + 60) % 360}, 70%, 60%)`);
+  
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+};
+
+const displayHud = (): void => {
+  ctx.fillStyle = 'white';
+  ctx.font = '18px Arial';
+  ctx.fillText('Score: 0', 10, 20);
+};
+
+const displayHero = (elapsedTime: number): void => {
+  const heroX = canvas.width / 2;
+  const heroY = canvas.height / 2;
+  const heroSize = 30 + 5 * Math.sin(elapsedTime / 200); // Simple animation
+  // draw a simple square as the hero
+
+
+  ctx.fillStyle = 'black';
+  ctx.fillRect(heroX - heroSize / 2, heroY - heroSize / 2, heroSize, heroSize);
 }
 
 const gameLoop = (elapsedTime: number): void => {
-  // Game logic and rendering would go here
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = 'white';
-  ctx.font = '14px Arial';
-  ctx.fillText(`Elapsed Time: ${elapsedTime} ms`, canvas.width - 180, 10);
-
+  clearScreen();
+  drawBackground(elapsedTime);
+  displayHero(elapsedTime);
+  displayHud();
 
   // For now, just loop
-  gameLoopAnimId = requestAnimationFrame(gameLoop);
+  gameLoopAnimId = window.requestAnimationFrame(gameLoop);
+
+  ctx.fillStyle = 'white';
+  ctx.font = '14px Arial';
+  ctx.fillText(`Elapsed Time: ${Math.round(elapsedTime / 1000)} s`, canvas.width - 150, 20);
 }
