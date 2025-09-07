@@ -2,12 +2,38 @@ let gameLoopAnimId: number;
 let canvas: HTMLCanvasElement;
 let ctx: CanvasRenderingContext2D;
 
+const addEventListeners = (): void => {
+  window.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    // Handle touch start
+  }, { passive: false });
+
+  window.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    // Handle touch move
+  }, { passive: false });
+
+  window.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    // Handle touch end
+  }, { passive: false });
+
+  window.addEventListener('keydown', (e) => {
+    // Handle key down
+  });
+
+  window.addEventListener('keyup', (e) => {
+    // Handle key up
+  });
+} 
+
 export const startGame = (): void => {
   canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
   // Ensure canvas size matches its displayed size to avoid distortion
   canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;
   ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+  addEventListeners();
   gameLoopAnimId = window.requestAnimationFrame(gameLoop);
 }
 
