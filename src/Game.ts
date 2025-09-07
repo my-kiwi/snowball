@@ -16,12 +16,25 @@ const clearScreen = (): void => {
 };
 
 const drawBackground = (elapsedTime: number): void => {
-  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  gradient.addColorStop(0, `hsl(${(elapsedTime / 100) % 360}, 70%, 80%)`);
-  gradient.addColorStop(1, `hsl(${(elapsedTime / 100 + 60) % 360}, 70%, 60%)`);
-  
-  ctx.fillStyle = gradient;
+  // create a street background with moving lines
+  ctx.fillStyle = 'gray';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.strokeStyle = 'white';
+  ctx.lineWidth = 20;
+  const lineHeight = 80;
+  const gapHeight = 90;
+  const totalHeight = lineHeight + gapHeight;
+  const offset = (elapsedTime / 10) % totalHeight;
+
+  for (let y = -totalHeight + offset; y < canvas.height; y += totalHeight) {
+    ctx.beginPath();
+    ctx.moveTo(canvas.width / 2 - 10, y);
+    ctx.lineTo(canvas.width / 2 - 10, y + lineHeight);
+    ctx.moveTo(canvas.width / 2 + 10, y);
+    ctx.lineTo(canvas.width / 2 + 10, y + lineHeight);
+    ctx.stroke();
+  }
 };
 
 const displayHud = (): void => {
