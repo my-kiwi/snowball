@@ -1,4 +1,3 @@
-# hello world seed
-base seed for my projects, deployed here:
+# snowball
 
-https://my-kiwi.github.io/seed
+https://my-kiwi.github.io/snowball
