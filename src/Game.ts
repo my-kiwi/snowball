@@ -2,15 +2,33 @@ let gameLoopAnimId: number;
 let canvas: HTMLCanvasElement;
 let ctx: CanvasRenderingContext2D;
 
+const state = {
+  bg: {
+    x: 0,
+    y: 0,
+    speed: 2,
+  },
+  hero: {
+    x: 100,
+    y: 100,
+    size: 30,
+    speed: 5,
+  }
+};
+
 const addEventListeners = (): void => {
   window.addEventListener('touchstart', (e) => {
     e.preventDefault();
     // Handle touch start
+    state.hero.x = e.touches[0].clientX;
+    state.hero.y = e.touches[0].clientY;
   }, { passive: false });
 
   window.addEventListener('touchmove', (e) => {
     e.preventDefault();
     // Handle touch move
+    state.hero.x = e.touches[0].clientX;
+    state.hero.y = e.touches[0].clientY;
   }, { passive: false });
 
   window.addEventListener('touchend', (e) => {
@@ -20,6 +38,20 @@ const addEventListeners = (): void => {
 
   window.addEventListener('keydown', (e) => {
     // Handle key down
+    switch (e.key) {
+      case 'ArrowUp':
+        state.hero.y -= state.hero.speed;
+        break;
+      case 'ArrowDown':
+        state.hero.y += state.hero.speed;
+        break;
+      case 'ArrowLeft':
+        state.hero.x -= state.hero.speed;
+        break;
+      case 'ArrowRight':
+        state.hero.x += state.hero.speed;
+        break;
+    }
   });
 
   window.addEventListener('keyup', (e) => {
@@ -43,24 +75,24 @@ const clearScreen = (): void => {
 
 const drawBackground = (elapsedTime: number): void => {
   // create a street background with moving lines
-  ctx.fillStyle = 'gray';
+  ctx.fillStyle = '#444';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.strokeStyle = 'white';
-  ctx.lineWidth = 20;
-  const lineHeight = 80;
-  const gapHeight = 90;
-  const totalHeight = lineHeight + gapHeight;
-  const offset = (elapsedTime / 10) % totalHeight;
+  // ctx.strokeStyle = 'white';
+  // ctx.lineWidth = 20;
+  // const lineHeight = 80;
+  // const gapHeight = 90;
+  // const totalHeight = lineHeight + gapHeight;
+  // const offset = (elapsedTime / 10) % totalHeight;
 
-  for (let y = -totalHeight + offset; y < canvas.height; y += totalHeight) {
-    ctx.beginPath();
-    ctx.moveTo(canvas.width / 2 - 10, y);
-    ctx.lineTo(canvas.width / 2 - 10, y + lineHeight);
-    ctx.moveTo(canvas.width / 2 + 10, y);
-    ctx.lineTo(canvas.width / 2 + 10, y + lineHeight);
-    ctx.stroke();
-  }
+  // for (let y = -totalHeight + offset; y < canvas.height; y += totalHeight) {
+  //   ctx.beginPath();
+  //   ctx.moveTo(canvas.width / 2 - 10, y);
+  //   ctx.lineTo(canvas.width / 2 - 10, y + lineHeight);
+  //   ctx.moveTo(canvas.width / 2 + 10, y);
+  //   ctx.lineTo(canvas.width / 2 + 10, y + lineHeight);
+  //   ctx.stroke();
+  // }
 };
 
 const displayHud = (): void => {
@@ -72,7 +104,7 @@ const displayHud = (): void => {
 const displayHero = (elapsedTime: number): void => {
   const heroX = canvas.width / 2;
   const heroY = canvas.height / 2;
-  const heroSize = 30 + 5 * Math.sin(elapsedTime / 200); // Simple animation
+  const heroSize = 30; // + 5 * Math.sin(elapsedTime / 200); // Simple animation
   // draw a simple square as the hero
 
 
@@ -89,7 +121,12 @@ const gameLoop = (elapsedTime: number): void => {
   // For now, just loop
   gameLoopAnimId = window.requestAnimationFrame(gameLoop);
 
-  ctx.fillStyle = 'white';
+  displayDebugInfo(elapsedTime);
+}
+
+const displayDebugInfo = (elapsedTime: number): void => {
+  ctx.fillStyle = 'yellow';
   ctx.font = '14px Arial';
-  ctx.fillText(`Elapsed Time: ${Math.round(elapsedTime / 1000)} s`, canvas.width - 150, 20);
+  ctx.fillText(`Elapsed Time: ${Math.floor(elapsedTime)} ms`, 10, canvas.height - 40);
+  ctx.fillText(`Hero Position: (${state.hero.x}, ${state.hero.y})`, 10, canvas.height - 20);
 }
