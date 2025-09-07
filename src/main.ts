@@ -1,6 +1,6 @@
-import { App } from './App';
+import { startGame } from './Game';
 
 const appDiv = document.getElementById('app');
 if (appDiv) {
-  App();
+  startGame();
 }

@@ -1,4 +1,4 @@
-export function App(): void {
+export const startGame = (): void => {
   const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
   const ctx = canvas.getContext('2d');
   
