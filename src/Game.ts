@@ -19,6 +19,7 @@ const state = {
   },
   level: {
     current: 0,
+    map: levels[0].map
   }
 };
 
@@ -80,7 +81,7 @@ const clearScreen = (): void => {
 };
 
 const getCurrentLevelMatrix = (): number[][] => {
-  return levels[state.level.current].map;
+  return state.level.map;
 }
 
 const getBgColor = (cellValue: number): string => {
