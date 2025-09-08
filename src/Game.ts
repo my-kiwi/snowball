@@ -1,9 +1,7 @@
-import { a } from 'vitest/dist/chunks/suite.d.FvehnV49';
 import levels from './levels.json';
 
 const isDebugMap = true
 
-let gameLoopAnimId: number;
 let canvas: HTMLCanvasElement;
 let ctx: CanvasRenderingContext2D;
 
@@ -102,7 +100,7 @@ export const startGame = (): void => {
   canvas.height = canvas.clientHeight;
   ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
   addEventListeners();
-  gameLoopAnimId = window.requestAnimationFrame(gameLoop);
+  window.requestAnimationFrame(gameLoop);
 }
 
 const clearScreen = (): void => {
@@ -159,7 +157,7 @@ const gameLoop = (elapsedTime: number): void => {
   displayHud();
 
   // For now, just loop
-  gameLoopAnimId = window.requestAnimationFrame(gameLoop);
+  window.requestAnimationFrame(gameLoop);
 
   displayDebugInfo(elapsedTime);
 }
