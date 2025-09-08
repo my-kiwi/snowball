@@ -1,4 +1,4 @@
-import levels from './levels.json';
+import levels from './levels';
 
 const isDebugMap = true
 
@@ -26,7 +26,7 @@ const state = {
   },
   level: {
     current: 0,
-    map: levels[0].map
+    map: levels[0]
   }
 };
 
