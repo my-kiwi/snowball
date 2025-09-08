@@ -92,7 +92,17 @@ export const startGame = (): void => {
   canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;
   ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+
+  // Handle high-DPI displays
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = canvas.clientWidth * dpr;
+  canvas.height = canvas.clientHeight * dpr;
+  ctx.scale(dpr, dpr);
+
+  // Game setup
   addEventListeners();
+
+  // Start the game loop
   window.requestAnimationFrame(gameLoop);
 }
 
