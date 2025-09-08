@@ -1,15 +1,8 @@
-import levels from './levels';
-
+import { levels, tileType, tileTypeToColor } from './levels';
 const isDebugMap = true
 
 let canvas: HTMLCanvasElement;
 let ctx: CanvasRenderingContext2D;
-
-const tileType = {
-  sidewalk: 0,
-  road: 1,
-  streetlamp: 2
-};
 
 const state = {
   bg: {
@@ -26,7 +19,7 @@ const state = {
   },
   level: {
     current: 0,
-    map: levels[0]
+    map: levels[0].map
   }
 };
 
@@ -41,7 +34,7 @@ const onTileClick = (x: number, y: number): void => {
     const row = Math.floor(y / cellHeight);
     if (row >= 0 && row < state.level.map.length && col >= 0 && col < state.level.map[0].length) {
       // rotate between different tile types
-      state.level.map[row][col] = (state.level.map[row][col] + 1) % Object.keys(tileType).length;
+      // FIXME state.level.map[row][col] = (state.level.map[row][col] + 1) % Object.keys(tileType).length;
     }
   }
 }
@@ -107,17 +100,8 @@ const clearScreen = (): void => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 };
 
-const getCurrentLevelMatrix = (): number[][] => {
+const getCurrentLevelMatrix = (): string[][] => {
   return state.level.map;
-}
-
-const getBgColor = (cellValue: number): string => {
-  switch (cellValue) {
-    case 0: return '#888'; // sidewalk
-    case 1: return '#444'; // road
-    case 2: return '#FFEA00'; // streetlamp
-    default: return '#FFFFFF'; // default white
-  }
 }
 
 const drawBackground = (elapsedTime: number): void => {
@@ -127,7 +111,7 @@ const drawBackground = (elapsedTime: number): void => {
   
   for (let row = 0; row < matrixToDraw.length; row++) {
     for (let col = 0; col < matrixToDraw[row].length; col++) {
-      ctx.fillStyle = getBgColor(matrixToDraw[row][col]);
+      ctx.fillStyle = tileTypeToColor[matrixToDraw[row][col]] || 'black';
       ctx.fillRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
     }
   }
