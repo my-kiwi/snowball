@@ -5,7 +5,10 @@ export const tileType = {
     hero: 'H',
     enemy: 'E',
     exit: 'X'
-};
+} as const;
+
+export type TileChar = // value of tileType
+    typeof tileType[keyof typeof tileType];
 
 export const tileTypeToColor = {
     [tileType.wall]: '#888', // sidewalk
@@ -16,8 +19,8 @@ export const tileTypeToColor = {
     [tileType.exit]: '#0F0' // exit
 };
 
-const toMatrix = (mapString: string): string[][] => {
-    return mapString.split('\n').slice(1, -1).map(line => line.split(''));
+const toMatrix = (mapString: string): TileChar[][] => {
+    return mapString.split('\n').slice(1, -1).map(line => line.split('') as unknown as TileChar[]);
 }
 
 export const levels = [

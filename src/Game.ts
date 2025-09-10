@@ -1,3 +1,4 @@
+import { drawCat, drawTile } from './drawing';
 import { levels, tileType, tileTypeToColor } from './levels';
 const isDebugMap = true
 
@@ -101,16 +102,32 @@ export const startGame = (): void => {
 
   // Game setup
   addEventListeners();
+  setHeroStartingPosition();
 
   // Start the game loop
   window.requestAnimationFrame(gameLoop);
+}
+
+const setHeroStartingPosition = (): void => {
+  // set hero at the tile marked as 'H' in the level map
+  for (let row = 0; row < state.level.map.length; row++) {
+    for (let col = 0; col < state.level.map[row].length; col++) {
+      if (state.level.map[row][col] === tileType.hero) {
+        const cellWidth = canvas.width / state.level.map[0].length;
+        const cellHeight = canvas.height / state.level.map.length;
+        state.hero.x = col * cellWidth + cellWidth / 2;
+        state.hero.y = row * cellHeight + cellHeight / 2;
+        return;
+      }
+    }
+  }
 }
 
 const clearScreen = (): void => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 };
 
-const getCurrentLevelMatrix = (): string[][] => {
+const getCurrentLevelMatrix = () => {
   return state.level.map;
 }
 
@@ -121,8 +138,8 @@ const drawBackground = (elapsedTime: number): void => {
   
   for (let row = 0; row < matrixToDraw.length; row++) {
     for (let col = 0; col < matrixToDraw[row].length; col++) {
-      ctx.fillStyle = tileTypeToColor[matrixToDraw[row][col]] || 'black';
-      ctx.fillRect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
+      const tile = matrixToDraw[row][col];
+      drawTile(ctx, tile, col * cellWidth, row * cellHeight, cellWidth, cellHeight);
     }
   }
 };
@@ -133,21 +150,12 @@ const displayHud = (): void => {
   ctx.fillText('Score: 0', 10, 20);
 };
 
-const displayHero = (elapsedTime: number): void => {
-  const heroX = canvas.width / 2;
-  const heroY = canvas.height / 2;
-  const heroSize = 30; // + 5 * Math.sin(elapsedTime / 200); // Simple animation
-  // draw a simple square as the hero
-
-
-  ctx.fillStyle = 'black';
-  ctx.fillRect(heroX - heroSize / 2, heroY - heroSize / 2, heroSize, heroSize);
-}
 
 const gameLoop = (elapsedTime: number): void => {
   clearScreen();
   drawBackground(elapsedTime);
-  displayHero(elapsedTime);
+  drawCat(ctx, state.hero.x, state.hero.y);
+  
   displayHud();
 
   // For now, just loop
