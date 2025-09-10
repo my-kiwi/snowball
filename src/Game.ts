@@ -135,6 +135,12 @@ const drawBackground = (elapsedTime: number): void => {
   const matrixToDraw = getCurrentLevelMatrix();
   const cellWidth = canvas.width / matrixToDraw[0].length;
   const cellHeight = canvas.height / matrixToDraw.length;
+
+  // first draw the entire background as road
+  ctx.fillStyle = 'black'
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // then draw each tile
   
   for (let row = 0; row < matrixToDraw.length; row++) {
     for (let col = 0; col < matrixToDraw[row].length; col++) {

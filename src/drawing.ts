@@ -45,10 +45,6 @@ export const drawCat = (ctx: CanvasRenderingContext2D, x: number, y: number): vo
 };
 
 export const drawTile = (ctx: CanvasRenderingContext2D, tile: TileChar, x: number, y: number, width: number, height: number): void => {
-  // draw road by default
-  ctx.fillStyle = tileTypeToColor[tileType.road];
-  ctx.fillRect(x, y, width, height);
-
   // draw specific tile types
   switch (tile) {
     case tileType.wall:
@@ -56,14 +52,10 @@ export const drawTile = (ctx: CanvasRenderingContext2D, tile: TileChar, x: numbe
       ctx.fillRect(x, y, width, height);
       break;
     case tileType.road:
-      ctx.fillStyle = tileTypeToColor[tileType.road];
-      ctx.fillRect(x, y, width, height);
+      // already drawn as background
       break;
     case tileType.streetlamp:
-      ctx.fillStyle = tileTypeToColor[tileType.streetlamp];
-      ctx.beginPath();
-      ctx.arc(x + width / 2, y + height / 2, Math.min(width, height) / 4, 0, Math.PI * 2);
-      ctx.fill();
+      drawStreetlamp(ctx, x + width / 2, y + height / 2);
       break;
     case tileType.hero:
       drawCat(ctx, x + width / 2, y + height / 2);
@@ -88,4 +80,30 @@ export const drawTile = (ctx: CanvasRenderingContext2D, tile: TileChar, x: numbe
       break;
   }
       
+}
+
+const drawStreetlamp = (ctx: CanvasRenderingContext2D, x: number, y: number): void => {
+  // draw the lamp as a lantern shape with light halo
+  const lampHeight = 40;
+  const lampWidth = 10;
+  const haloRadius = 30;
+
+  // draw the pole
+  ctx.fillStyle = '#555';
+  ctx.fillRect(x - lampWidth / 2, y, lampWidth, lampHeight);
+
+  // draw the lantern
+  ctx.fillStyle = '#FFEA00';
+  ctx.beginPath();
+  ctx.ellipse(x, y, lampWidth * 1.5, lampHeight * 0.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // draw the light halo
+  const gradient = ctx.createRadialGradient(x, y, lampWidth * 0.5, x, y, haloRadius);
+  gradient.addColorStop(0, 'rgba(255, 234, 0, 0.6)');
+  gradient.addColorStop(1, 'rgba(255, 234, 0, 0)');
+  ctx.fillStyle = gradient;
+  ctx.beginPath();
+  ctx.arc(x, y, haloRadius, 0, Math.PI * 2);
+  ctx.fill();
 }
