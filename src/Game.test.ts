@@ -18,6 +18,7 @@ describe('Game', () => {
       fillRect: vi.fn(),
       fillText: vi.fn(),
       clearRect: vi.fn(),
+      scale: vi.fn(),
     } as unknown as CanvasRenderingContext2D;
 
     // Mock getContext to return our mock context
