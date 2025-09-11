@@ -94,7 +94,7 @@ export const startGame = (): void => {
   canvas.height = canvas.clientHeight;
   ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
-  // Handle high-DPI displays
+  // Handle high-DPI displays (disabled for now as it causes rendering issues)
   const dpr = /*window.devicePixelRatio || */ 1;
   canvas.width = canvas.clientWidth * dpr;
   canvas.height = canvas.clientHeight * dpr;
