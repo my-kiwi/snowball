@@ -133,10 +133,8 @@ export const startGame = (): void => {
   const dpr = window.devicePixelRatio || 1;
   canvas.width = canvas.clientWidth * dpr;
   canvas.height = canvas.clientHeight * dpr;
-  ctx.scale(dpr, dpr);
 
-  // scale context to fit the canvas size
-  ctx.scale(canvas.clientWidth / canvas.width, canvas.clientHeight / canvas.height);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // scale the context to account for device pixel ratio
 
   // Game setup
   addEventListeners();
