@@ -25,25 +25,30 @@ const toMatrix = (mapString: string): TileChar[][] => {
 
 export const levels = [
     {
-        name: 'Level 1',
+        name: 'Level 1: basics',
         map: toMatrix(`
 ###########
-#H        #
+#         #
+#         #
+#         #
+#  H O    #
+#         #
+#         #
+#         #
+########  #
+#         #
+#         #
 #         #
 #    O    #
 #         #
 #         #
 #         #
-#         #
-#         #
-#    O    #
-#         #
-#         #
+#  ########
 #         #
 #         #
 #         #
 #    O    #
-#      E  #
+#         #
 #         #
 #         #
 #        X#

@@ -36,9 +36,8 @@ describe('Levels', () => {
                 });
             });
 
-            // all maps should be exactly 11x21 tiles for now
-            it('should be exactly 11x21 tiles', () => {
-                expect(level.map.length).toBe(21);
+            it('should be exactly 11x26 tiles', () => {
+                expect(level.map.length).toBe(26);
                 level.map.forEach(row => {
                     expect(row.length).toBe(11);
                 });
