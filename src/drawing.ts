@@ -66,13 +66,7 @@ export const drawTile = (ctx: CanvasRenderingContext2D, tile: TileChar, x: numbe
       ctx.fillRect(x + width * 0.2, y + height * 0.2, width * 0.6, height * 0.6);
       break;
     case tileType.exit:
-      ctx.fillStyle = tileTypeToColor[tileType.exit];
-      ctx.beginPath();
-      ctx.moveTo(x + width / 2, y + height * 0.2);
-      ctx.lineTo(x + width * 0.8, y + height * 0.8);
-      ctx.lineTo(x + width * 0.2, y + height * 0.8);
-      ctx.closePath();
-      ctx.fill();
+      drawExit(ctx, x, y, width, height);
       break;
     default:
       // Unknown tile type
@@ -80,7 +74,22 @@ export const drawTile = (ctx: CanvasRenderingContext2D, tile: TileChar, x: numbe
       ctx.fillRect(x, y, width, height);
       break;
   }
-      
+
+}
+
+const drawExit = (ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number): void => {
+  // draw a simple door shape
+  ctx.fillStyle = 'brown';
+  ctx.fillRect(x + width * 0.2, y - height * 0.2, width * 0.6, height);
+  // draw the door frame
+  ctx.strokeStyle = 'white';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x + width * 0.2, y - height * 0.2, width * 0.6, height);
+  // draw the doorknob
+  ctx.fillStyle = 'gold';
+  ctx.beginPath();
+  ctx.arc(x + width * 0.7, y + height/3, width * 0.05, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 const drawStreetlamp = (ctx: CanvasRenderingContext2D, x: number, y: number): void => {
@@ -110,9 +119,9 @@ const drawStreetlamp = (ctx: CanvasRenderingContext2D, x: number, y: number): vo
   ctx.arc(x, y, haloRadius, 0, Math.PI * 2);
   ctx.fill();
 
-    // draw the pole
+  // draw the pole
   ctx.fillStyle = frameColor;
-  ctx.fillRect(x - lampWidth / 2, y, lampWidth, lampHeight/2);
+  ctx.fillRect(x - lampWidth / 2, y, lampWidth, lampHeight / 2);
 
   // draw lantern frame
   ctx.strokeStyle = '#000';
@@ -121,7 +130,7 @@ const drawStreetlamp = (ctx: CanvasRenderingContext2D, x: number, y: number): vo
   ctx.moveTo(x - lampWidth, y); // bottom left
   ctx.lineTo(x + lampWidth, y); // bottom right
   ctx.lineTo(x + lampWidth * 1.5, y - lampHeight * 0.6); // top right
-  ctx.lineTo(x - lampWidth *1.5, y - lampHeight * 0.6); // top left
+  ctx.lineTo(x - lampWidth * 1.5, y - lampHeight * 0.6); // top left
   ctx.closePath();
   ctx.stroke();
 
@@ -143,7 +152,7 @@ const drawStreetlamp = (ctx: CanvasRenderingContext2D, x: number, y: number): vo
   ctx.lineTo(x + lampWidth / 2, y - lampHeight * 0.6); // top center right
   ctx.stroke();
 
-  
+
   // draw the pole base
   ctx.fillStyle = frameColor;
   ctx.fillRect(x - lampWidth, y + lampHeight / 2, lampWidth * 2, lampWidth);
