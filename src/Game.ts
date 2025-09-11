@@ -73,32 +73,6 @@ const updateCatPosition = (): void => {
   }
 }
 
-
-const onTileClick = (x: number, y: number): void => {
-  // move hero towards the clicked position
-  if (state.hero.x < x) {
-    state.hero.x += state.hero.speed;
-  } else if (state.hero.x > x) {
-    state.hero.x -= state.hero.speed;
-  }
-  if (state.hero.y < y) {
-    state.hero.y += state.hero.speed;
-  } else if (state.hero.y > y) {
-    state.hero.y -= state.hero.speed;
-  }
-  // check which tile was touched and change its type when in debug mode
-  if (isDebugMap) {
-    const cellWidth = canvas.width / state.level.map[0].length;
-    const cellHeight = canvas.height / state.level.map.length;
-    const col = Math.floor(x / cellWidth);
-    const row = Math.floor(y / cellHeight);
-    if (row >= 0 && row < state.level.map.length && col >= 0 && col < state.level.map[0].length) {
-      // rotate between different tile types
-      // FIXME state.level.map[row][col] = (state.level.map[row][col] + 1) % Object.keys(tileType).length;
-    }
-  }
-}
-
 const addEventListeners = (): void => {
   window.addEventListener('pointerdown', (e) => {
     e.preventDefault();
