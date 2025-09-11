@@ -1,22 +1,9 @@
 import { canvas, ctx } from './canvas';
 import { drawCat, drawTile } from './drawing';
 import { levels, tileType, tileTypeToColor } from './levels';
-
+import { addControlsEventListeners, controls } from './controls';
 
 const state = {
-  controls: {
-    pointer: {
-      x: 0,
-      y: 0,
-      isDown: false
-    },
-    keysPressed: {
-      ArrowUp: false,
-      ArrowDown: false,
-      ArrowLeft: false,
-      ArrowRight: false
-    }
-  },
   bg: {
     x: 0,
     y: 0,
@@ -38,26 +25,26 @@ const getNextPosition = (currentPos: { x: number, y: number }, speed: number): {
   let nextPosX = currentPos.x;
   let nextPosY = currentPos.y;
   // Move hero based on keyboard input
-  if (state.controls.keysPressed.ArrowUp) {
+  if (controls.keysPressed.ArrowUp) {
     nextPosY -= speed;
   }
-  if (state.controls.keysPressed.ArrowDown) {
+  if (controls.keysPressed.ArrowDown) {
     nextPosY += speed;
   }
-  if (state.controls.keysPressed.ArrowLeft) {
+  if (controls.keysPressed.ArrowLeft) {
     nextPosX -= speed;
   }
-  if (state.controls.keysPressed.ArrowRight) {
+  if (controls.keysPressed.ArrowRight) {
     nextPosX += speed;
   }
 
   // Move hero towards pointer if pointer is down
-  if (state.controls.pointer.isDown) {
+  if (controls.pointer.isDown) {
     // move hero towards the clicked position
     // calculate real x and y based on canvas size
     const rect = canvas.getBoundingClientRect();
-    const x = (state.controls.pointer.x - rect.left) * (canvas.clientWidth / rect.width);
-    const y = (state.controls.pointer.y - rect.top) * (canvas.clientHeight / rect.height);
+    const x = (controls.pointer.x - rect.left) * (canvas.clientWidth / rect.width);
+    const y = (controls.pointer.y - rect.top) * (canvas.clientHeight / rect.height);
 
     if (currentPos.x < x - speed) {
       nextPosX += speed;
@@ -74,58 +61,9 @@ const getNextPosition = (currentPos: { x: number, y: number }, speed: number): {
   return { x: nextPosX, y: nextPosY };
 }
 
-const addEventListeners = (): void => {
-  window.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    state.controls.pointer = { x: e.clientX, y: e.clientY, isDown: true };
-  }, { passive: false });
-
-  window.addEventListener('pointerup', (e) => {
-    e.preventDefault();
-    state.controls.pointer.isDown = false;
-  });
-
-  window.addEventListener('pointermove', (e) => {
-    e.preventDefault();
-    if (state.controls.pointer.isDown) {
-      state.controls.pointer = { x: e.clientX, y: e.clientY, isDown: true };
-    }
-  }, { passive: false });
-
-  window.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    state.controls.pointer = { x: e.touches[0].clientX, y: e.touches[0].clientY, isDown: true };
-  }, { passive: false });
-
-  window.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-    if (state.controls.pointer.isDown) {
-      state.controls.pointer = { x: e.touches[0].clientX, y: e.touches[0].clientY, isDown: true };
-    }
-  }, { passive: false });
-
-  window.addEventListener('touchend', (e) => {
-    e.preventDefault();
-    // // Handle touch end
-    state.controls.pointer.isDown = false;
-  }, { passive: false });
-
-  window.addEventListener('keydown', (e) => {
-    if (e.key in state.controls.keysPressed) {
-      state.controls.keysPressed[e.key as keyof typeof state.controls.keysPressed] = true;
-    }
-  });
-
-  window.addEventListener('keyup', (e) => {
-    if (e.key in state.controls.keysPressed) {
-      state.controls.keysPressed[e.key as keyof typeof state.controls.keysPressed] = false;
-    }
-  });
-}
-
 export const startGame = (): void => {
   // Game setup
-  addEventListeners();
+  addControlsEventListeners();
   setHeroStartingPosition();
 
   // Start the game loop
