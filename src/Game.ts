@@ -129,11 +129,14 @@ export const startGame = (): void => {
   canvas.height = canvas.clientHeight;
   ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
-  // Handle high-DPI displays (disabled for now as it causes rendering issues)
-  const dpr = /*window.devicePixelRatio || */ 1;
+  // Handle high-DPI displays
+  const dpr = window.devicePixelRatio || 1;
   canvas.width = canvas.clientWidth * dpr;
   canvas.height = canvas.clientHeight * dpr;
   ctx.scale(dpr, dpr);
+
+  // scale context to fit the canvas size
+  ctx.scale(canvas.clientWidth / canvas.width, canvas.clientHeight / canvas.height);
 
   // Game setup
   addEventListeners();
@@ -176,7 +179,6 @@ const drawBackground = (): void => {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // then draw each tile
-  
   for (let row = 0; row < matrixToDraw.length; row++) {
     for (let col = 0; col < matrixToDraw[row].length; col++) {
       const tile = matrixToDraw[row][col];
@@ -191,11 +193,9 @@ const displayHud = (): void => {
   ctx.fillText('Score: 0', 10, 20);
 };
 
-
 const gameLoop = (elapsedTime: number): void => {
   // state updates
   updateCatPosition();
-
 
   // drawing
   clearScreen();
@@ -204,7 +204,7 @@ const gameLoop = (elapsedTime: number): void => {
   
   displayHud();
 
-  // For now, just loop
+  // schedule next frame
   window.requestAnimationFrame(gameLoop);
 
   displayDebugInfo(elapsedTime);
