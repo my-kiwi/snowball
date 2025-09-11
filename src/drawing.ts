@@ -52,7 +52,7 @@ export const drawTile = (ctx: CanvasRenderingContext2D, tile: TileChar, x: numbe
       ctx.fillRect(x, y, width, height);
       break;
     case tileType.road:
-      // already drawn as background
+      // skip as already drawn by default
       break;
     case tileType.streetlamp:
       drawStreetlamp(ctx, x + width / 2, y + height / 2);
@@ -84,18 +84,22 @@ export const drawTile = (ctx: CanvasRenderingContext2D, tile: TileChar, x: numbe
 
 const drawStreetlamp = (ctx: CanvasRenderingContext2D, x: number, y: number): void => {
   // draw the lamp as a lantern shape with light halo
-  const lampHeight = 40;
+  const lampHeight = 60;
   const lampWidth = 10;
-  const haloRadius = 30;
+  const haloRadius = 100;
+  const frameColor = '#000';
+  const lightColor = '#FFEA00';
 
-  // draw the pole
-  ctx.fillStyle = '#555';
-  ctx.fillRect(x - lampWidth / 2, y, lampWidth, lampHeight);
 
-  // draw the lantern
-  ctx.fillStyle = '#FFEA00';
+
+  // draw the lantern that should look like a london streetlamp
+  ctx.fillStyle = lightColor;
   ctx.beginPath();
-  ctx.ellipse(x, y, lampWidth * 1.5, lampHeight * 0.5, 0, 0, Math.PI * 2);
+  ctx.moveTo(x - lampWidth, y); // bottom left
+  ctx.lineTo(x + lampWidth, y); // bottom right
+  ctx.lineTo(x + lampWidth * 1.5, y - lampHeight * 0.6); // top right
+  ctx.lineTo(x - lampWidth * 1.5, y - lampHeight * 0.6); // top left
+  ctx.closePath();
   ctx.fill();
 
   // draw the light halo
@@ -106,4 +110,52 @@ const drawStreetlamp = (ctx: CanvasRenderingContext2D, x: number, y: number): vo
   ctx.beginPath();
   ctx.arc(x, y, haloRadius, 0, Math.PI * 2);
   ctx.fill();
+
+    // draw the pole
+  ctx.fillStyle = frameColor;
+  ctx.fillRect(x - lampWidth / 2, y, lampWidth, lampHeight);
+
+  // draw lantern frame
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x - lampWidth, y); // bottom left
+  ctx.lineTo(x + lampWidth, y); // bottom right
+  ctx.lineTo(x + lampWidth * 1.5, y - lampHeight * 0.6); // top right
+  ctx.lineTo(x - lampWidth *1.5, y - lampHeight * 0.6); // top left
+  ctx.closePath();
+  ctx.stroke();
+
+  // draw the "hat" of the lantern
+  ctx.fillStyle = '#000';
+  ctx.beginPath();
+  ctx.moveTo(x - lampWidth * 1.5, y - lampHeight * 0.6); // top left
+  ctx.lineTo(x + lampWidth * 1.5, y - lampHeight * 0.6); // top right
+  ctx.lineTo(x + lampWidth * 1.2, y - lampHeight * 0.8); // peak right
+  ctx.lineTo(x - lampWidth * 1.2, y - lampHeight * 0.8); // peak left
+  ctx.closePath();
+  ctx.fill();
+
+  // vertical lines
+  ctx.beginPath();
+  ctx.moveTo(x - lampWidth / 2, y); // bottom center left
+  ctx.lineTo(x - lampWidth / 2, y - lampHeight * 0.6); // top center left
+  ctx.moveTo(x + lampWidth / 2, y); // bottom center right
+  ctx.lineTo(x + lampWidth / 2, y - lampHeight * 0.6); // top center right
+  ctx.stroke();
+
+  
+  // draw the pole base
+  ctx.fillStyle = frameColor;
+  ctx.fillRect(x - lampWidth, y + lampHeight, lampWidth * 2, lampWidth);
+
+  // // draw some light rays
+  // ctx.strokeStyle = 'rgba(255, 234, 0, 0.3)';
+  // ctx.lineWidth = 2;
+  // for (let angle = Math.PI / 4; angle < Math.PI * 2; angle += Math.PI / 2) {
+  //   ctx.beginPath();
+  //   ctx.moveTo(x, y);
+  //   ctx.lineTo(x + Math.cos(angle) * haloRadius, y + Math.sin(angle) * haloRadius);
+  //   ctx.stroke();
+  // }
 }
