@@ -1,3 +1,4 @@
+import { stat } from 'fs';
 import { drawCat, drawTile } from './drawing';
 import { levels, tileType, tileTypeToColor } from './levels';
 const isDebugMap = true
@@ -6,16 +7,28 @@ let canvas: HTMLCanvasElement;
 let ctx: CanvasRenderingContext2D;
 
 const state = {
+  controls: {
+    pointer: {
+      x: 0,
+      y: 0,
+      isDown: false
+    },
+    keysPressed: {
+      ArrowUp: false,
+      ArrowDown: false,
+      ArrowLeft: false,
+      ArrowRight: false
+    }
+  },
   bg: {
     x: 0,
     y: 0,
-    speed: 2,
   },
   hero: {
     x: 100,
     y: 100,
     size: 30,
-    speed: 5,
+    speed: 2.5,
     mapPosition: { x: 0, y: 0 }
   },
   level: {
@@ -24,9 +37,55 @@ const state = {
   }
 };
 
+const updateCatPosition = (): void => {
+  // Move hero based on keyboard input
+  if (state.controls.keysPressed.ArrowUp) {
+    state.hero.y -= state.hero.speed;
+  }
+  if (state.controls.keysPressed.ArrowDown) {
+    state.hero.y += state.hero.speed;
+  }
+  if (state.controls.keysPressed.ArrowLeft) {
+    state.hero.x -= state.hero.speed;
+  }
+  if (state.controls.keysPressed.ArrowRight) {
+    state.hero.x += state.hero.speed;
+  }
+
+  // Move hero towards pointer if pointer is down
+  if (state.controls.pointer.isDown) {
+    // move hero towards the clicked position
+    // calculate real x and y based on canvas size
+    const rect = canvas.getBoundingClientRect();
+    const x = (state.controls.pointer.x - rect.left) * (canvas.width / rect.width);
+    const y = (state.controls.pointer.y - rect.top) * (canvas.height / rect.height);
+
+    if (state.hero.x < x - state.hero.speed) {
+      state.hero.x += state.hero.speed;
+    } else if (state.hero.x > x + state.hero.speed) {
+      state.hero.x -= state.hero.speed;
+    }
+    if (state.hero.y < y - state.hero.speed) {
+      state.hero.y += state.hero.speed;
+    } else if (state.hero.y > y + state.hero.speed) {
+      state.hero.y -= state.hero.speed;
+    }
+  }
+}
+
+
 const onTileClick = (x: number, y: number): void => {
-  state.hero.x = x;
-  state.hero.y = y;
+  // move hero towards the clicked position
+  if (state.hero.x < x) {
+    state.hero.x += state.hero.speed;
+  } else if (state.hero.x > x) {
+    state.hero.x -= state.hero.speed;
+  }
+  if (state.hero.y < y) {
+    state.hero.y += state.hero.speed;
+  } else if (state.hero.y > y) {
+    state.hero.y -= state.hero.speed;
+  }
   // check which tile was touched and change its type when in debug mode
   if (isDebugMap) {
     const cellWidth = canvas.width / state.level.map[0].length;
@@ -43,47 +102,49 @@ const onTileClick = (x: number, y: number): void => {
 const addEventListeners = (): void => {
   window.addEventListener('pointerdown', (e) => {
     e.preventDefault();
-    // Handle touch start
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-    const y = (e.clientY - rect.top) * (canvas.height / rect.height);
-    onTileClick(x, y);
+    state.controls.pointer = { x: e.clientX, y: e.clientY, isDown: true };
+  }, { passive: false });
+
+  window.addEventListener('pointerup', (e) => {
+    e.preventDefault();
+    state.controls.pointer.isDown = false;
+  });
+
+  window.addEventListener('pointermove', (e) => {
+    e.preventDefault();
+    if (state.controls.pointer.isDown) {
+      state.controls.pointer = { x: e.clientX, y: e.clientY, isDown: true };
+    }
+  }, { passive: false });
+
+  window.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    state.controls.pointer = { x: e.touches[0].clientX, y: e.touches[0].clientY, isDown: true };
   }, { passive: false });
 
   window.addEventListener('touchmove', (e) => {
     e.preventDefault();
-    // Handle touch move
-    state.hero.x = e.touches[0].clientX;
-    state.hero.y = e.touches[0].clientY;
+    if (state.controls.pointer.isDown) {
+      state.controls.pointer = { x: e.touches[0].clientX, y: e.touches[0].clientY, isDown: true };
+    }
   }, { passive: false });
 
   window.addEventListener('touchend', (e) => {
     e.preventDefault();
-    // Handle touch end
-    state.hero.x = e.changedTouches[0].clientX;
-    state.hero.y = e.changedTouches[0].clientY;
+    // // Handle touch end
+    state.controls.pointer.isDown = false;
   }, { passive: false });
 
   window.addEventListener('keydown', (e) => {
-    // Handle key down
-    switch (e.key) {
-      case 'ArrowUp':
-        state.hero.y -= state.hero.speed;
-        break;
-      case 'ArrowDown':
-        state.hero.y += state.hero.speed;
-        break;
-      case 'ArrowLeft':
-        state.hero.x -= state.hero.speed;
-        break;
-      case 'ArrowRight':
-        state.hero.x += state.hero.speed;
-        break;
+    if (e.key in state.controls.keysPressed) {
+      state.controls.keysPressed[e.key as keyof typeof state.controls.keysPressed] = true;
     }
   });
 
   window.addEventListener('keyup', (e) => {
-    // Handle key up
+    if (e.key in state.controls.keysPressed) {
+      state.controls.keysPressed[e.key as keyof typeof state.controls.keysPressed] = false;
+    }
   });
 } 
 
@@ -131,7 +192,7 @@ const getCurrentLevelMatrix = () => {
   return state.level.map;
 }
 
-const drawBackground = (elapsedTime: number): void => {
+const drawBackground = (): void => {
   const matrixToDraw = getCurrentLevelMatrix();
   const cellWidth = canvas.width / matrixToDraw[0].length;
   const cellHeight = canvas.height / matrixToDraw.length;
@@ -158,8 +219,13 @@ const displayHud = (): void => {
 
 
 const gameLoop = (elapsedTime: number): void => {
+  // state updates
+  updateCatPosition();
+
+
+  // drawing
   clearScreen();
-  drawBackground(elapsedTime);
+  drawBackground();
   drawCat(ctx, state.hero.x, state.hero.y);
   
   displayHud();

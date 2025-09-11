@@ -58,7 +58,7 @@ export const drawTile = (ctx: CanvasRenderingContext2D, tile: TileChar, x: numbe
       drawStreetlamp(ctx, x + width / 2, y + height / 2);
       break;
     case tileType.hero:
-      drawCat(ctx, x + width / 2, y + height / 2);
+      // skip as drawn separately
       break;
     case tileType.enemy:
       ctx.fillStyle = tileTypeToColor[tileType.enemy];
@@ -86,11 +86,9 @@ const drawStreetlamp = (ctx: CanvasRenderingContext2D, x: number, y: number): vo
   // draw the lamp as a lantern shape with light halo
   const lampHeight = 60;
   const lampWidth = 10;
-  const haloRadius = 100;
+  const haloRadius = 150;
   const frameColor = '#000';
   const lightColor = '#FFEA00';
-
-
 
   // draw the lantern that should look like a london streetlamp
   ctx.fillStyle = lightColor;
@@ -103,7 +101,7 @@ const drawStreetlamp = (ctx: CanvasRenderingContext2D, x: number, y: number): vo
   ctx.fill();
 
   // draw the light halo
-  const gradient = ctx.createRadialGradient(x, y, lampWidth * 0.5, x, y, haloRadius);
+  const gradient = ctx.createRadialGradient(x, y - lampHeight / 2, lampWidth * 0.5, x, y, haloRadius);
   gradient.addColorStop(0, 'rgba(255, 234, 0, 0.6)');
   gradient.addColorStop(1, 'rgba(255, 234, 0, 0)');
   ctx.fillStyle = gradient;
