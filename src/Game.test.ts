@@ -19,6 +19,20 @@ describe('Game', () => {
       fillText: vi.fn(),
       clearRect: vi.fn(),
       scale: vi.fn(),
+      setTransform: vi.fn(),
+      beginPath: vi.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      closePath: vi.fn(),
+      stroke: vi.fn(),
+      strokeStyle: '',
+      lineWidth: 0,
+      arc: vi.fn(),
+      fill: vi.fn(),
+      createRadialGradient: vi.fn().mockReturnValue({
+        addColorStop: vi.fn()
+      }),
+      // Add any other methods/properties you use in your drawing code
     } as unknown as CanvasRenderingContext2D;
 
     // Mock getContext to return our mock context
