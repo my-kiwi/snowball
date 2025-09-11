@@ -134,10 +134,33 @@ const updateCatPosition = (): void => {
   }
 }
 
+const checkExitCollision = (): void => {
+  const matrix = state.level.map;
+  const cellWidth = canvas.clientWidth / matrix[0].length;
+  const cellHeight = canvas.clientHeight / matrix.length;
+
+  const col = Math.floor(state.hero.x / cellWidth);
+  const row = Math.floor(state.hero.y / cellHeight);
+
+  if (row >= 0 && row < matrix.length && col >= 0 && col < matrix[0].length) {
+    const tile = matrix[row][col];
+    if (tile === tileType.exit) {
+      // Move to next level or restart
+      state.level.current++;
+      if (state.level.current >= levels.length) {
+        state.level.current = 0; // restart from first level for now
+      }
+      state.level.map = levels[state.level.current].map;
+      setHeroStartingPosition();
+    }
+  }
+}
+
 
 const gameLoop = (elapsedTime: number): void => {
   // state updates
   updateCatPosition();
+  checkExitCollision();
 
   // drawing
   clearScreen();
