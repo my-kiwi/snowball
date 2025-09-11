@@ -1,6 +1,6 @@
 import { canvas, ctx } from './canvas';
 import { drawCat, drawTile } from './drawing';
-import { levels, tileType, tileTypeToColor } from './levels';
+import { levels, TileChar, tileType, tileTypeToColor } from './levels';
 import { addControlsEventListeners, controls } from './controls';
 
 const state = {
@@ -89,23 +89,18 @@ const clearScreen = (): void => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 };
 
-const getCurrentLevelMatrix = () => {
-  return state.level.map;
-}
-
-const drawBackground = (): void => {
-  const matrixToDraw = getCurrentLevelMatrix();
-  const cellWidth = canvas.clientWidth / matrixToDraw[0].length;
-  const cellHeight = canvas.clientHeight / matrixToDraw.length;
+const drawBackground = (map: TileChar[][]): void => {
+  const cellWidth = canvas.clientWidth / map[0].length;
+  const cellHeight = canvas.clientHeight / map.length;
 
   // first draw the entire background as road
   ctx.fillStyle = 'black';
   ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 
   // then draw each tile
-  for (let row = 0; row < matrixToDraw.length; row++) {
-    for (let col = 0; col < matrixToDraw[row].length; col++) {
-      const tile = matrixToDraw[row][col];
+  for (let row = 0; row < map.length; row++) {
+    for (let col = 0; col < map[row].length; col++) {
+      const tile = map[row][col];
       drawTile(ctx, tile, col * cellWidth, row * cellHeight, cellWidth, cellHeight);
     }
   }
@@ -121,7 +116,7 @@ const updateCatPosition = (): void => {
   const { x: nextPosX, y: nextPosY } = getNextPosition({ x: state.hero.x, y: state.hero.y }, state.hero.speed);
 
   // check for collisions with walls
-  const matrix = getCurrentLevelMatrix();
+  const matrix = state.level.map;
   const cellWidth = canvas.clientWidth / matrix[0].length;
   const cellHeight = canvas.clientHeight / matrix.length;
 
@@ -146,7 +141,7 @@ const gameLoop = (elapsedTime: number): void => {
 
   // drawing
   clearScreen();
-  drawBackground();
+  drawBackground(state.level.map);
   drawCat(ctx, state.hero.x, state.hero.y);
 
   displayHud();
@@ -154,7 +149,7 @@ const gameLoop = (elapsedTime: number): void => {
   // schedule next frame
   window.requestAnimationFrame(gameLoop);
 
-  displayDebugInfo(elapsedTime);
+  // displayDebugInfo(elapsedTime);
 }
 
 const displayDebugInfo = (elapsedTime: number): void => {
