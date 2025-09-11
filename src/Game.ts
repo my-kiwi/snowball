@@ -1,10 +1,7 @@
-import { stat } from 'fs';
+import { canvas, ctx } from './canvas';
 import { drawCat, drawTile } from './drawing';
 import { levels, tileType, tileTypeToColor } from './levels';
-const isDebugMap = true
 
-let canvas: HTMLCanvasElement;
-let ctx: CanvasRenderingContext2D;
 
 const state = {
   controls: {
@@ -57,8 +54,8 @@ const updateCatPosition = (): void => {
     // move hero towards the clicked position
     // calculate real x and y based on canvas size
     const rect = canvas.getBoundingClientRect();
-    const x = (state.controls.pointer.x - rect.left) * (canvas.width / rect.width);
-    const y = (state.controls.pointer.y - rect.top) * (canvas.height / rect.height);
+    const x = (state.controls.pointer.x - rect.left) * (canvas.clientWidth / rect.width);
+    const y = (state.controls.pointer.y - rect.top) * (canvas.clientHeight / rect.height);
 
     if (state.hero.x < x - state.hero.speed) {
       state.hero.x += state.hero.speed;
@@ -123,19 +120,6 @@ const addEventListeners = (): void => {
 } 
 
 export const startGame = (): void => {
-  canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
-  // Ensure canvas size matches its displayed size to avoid distortion
-  canvas.width = canvas.clientWidth;
-  canvas.height = canvas.clientHeight;
-  ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-
-  // Handle high-DPI displays
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = canvas.clientWidth * dpr;
-  canvas.height = canvas.clientHeight * dpr;
-
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // scale the context to account for device pixel ratio
-
   // Game setup
   addEventListeners();
   setHeroStartingPosition();
@@ -149,8 +133,8 @@ const setHeroStartingPosition = (): void => {
   for (let row = 0; row < state.level.map.length; row++) {
     for (let col = 0; col < state.level.map[row].length; col++) {
       if (state.level.map[row][col] === tileType.hero) {
-        const cellWidth = canvas.width / state.level.map[0].length;
-        const cellHeight = canvas.height / state.level.map.length;
+        const cellWidth = canvas.clientWidth / state.level.map[0].length;
+        const cellHeight = canvas.clientHeight / state.level.map.length;
         state.hero.x = col * cellWidth + cellWidth / 2;
         state.hero.y = row * cellHeight + cellHeight / 2;
         return;
@@ -169,12 +153,12 @@ const getCurrentLevelMatrix = () => {
 
 const drawBackground = (): void => {
   const matrixToDraw = getCurrentLevelMatrix();
-  const cellWidth = canvas.width / matrixToDraw[0].length;
-  const cellHeight = canvas.height / matrixToDraw.length;
+  const cellWidth = canvas.clientWidth / matrixToDraw[0].length;
+  const cellHeight = canvas.clientHeight / matrixToDraw.length;
 
   // first draw the entire background as road
-  ctx.fillStyle = 'black'
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = 'black';
+  ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 
   // then draw each tile
   for (let row = 0; row < matrixToDraw.length; row++) {
@@ -211,6 +195,6 @@ const gameLoop = (elapsedTime: number): void => {
 const displayDebugInfo = (elapsedTime: number): void => {
   ctx.fillStyle = 'yellow';
   ctx.font = '14px Arial';
-  ctx.fillText(`Elapsed Time: ${Math.floor(elapsedTime)} ms`, 10, canvas.height - 40);
-  ctx.fillText(`Hero Position: (${state.hero.x}, ${state.hero.y})`, 10, canvas.height - 20);
+  ctx.fillText(`Elapsed Time: ${Math.floor(elapsedTime)} ms`, 10, canvas.clientHeight - 40);
+  ctx.fillText(`Hero Position: (${state.hero.x}, ${state.hero.y})`, 10, canvas.clientHeight - 20);
 }

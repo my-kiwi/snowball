@@ -29,11 +29,6 @@ export const levels = [
         map: toMatrix(`
 ###########
 #H        #
-#    O    #
-#         #
-#         #
-#         #
-#         #
 #         #
 #    O    #
 #         #
@@ -43,7 +38,12 @@ export const levels = [
 #         #
 #    O    #
 #         #
-#       E #
+#         #
+#         #
+#         #
+#         #
+#    O    #
+#      E  #
 #         #
 #         #
 #        X#

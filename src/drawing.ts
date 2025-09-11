@@ -1,8 +1,9 @@
+import { worldToCanvasSize } from "./canvas";
 import { tileTypeToColor, TileChar, tileType } from "./levels";
 
 export const drawCat = (ctx: CanvasRenderingContext2D, x: number, y: number): void => {
   ctx.fillStyle = 'black';
-  const size = 50;
+  const size = worldToCanvasSize(70);
   // draw a simple cat shape, first the head
   ctx.beginPath();
   ctx.arc(x, y, size * 0.3, 0, Math.PI * 2); // head
@@ -84,9 +85,9 @@ export const drawTile = (ctx: CanvasRenderingContext2D, tile: TileChar, x: numbe
 
 const drawStreetlamp = (ctx: CanvasRenderingContext2D, x: number, y: number): void => {
   // draw the lamp as a lantern shape with light halo
-  const lampHeight = 60;
-  const lampWidth = 10;
-  const haloRadius = 150;
+  const lampHeight = worldToCanvasSize(60);
+  const lampWidth = worldToCanvasSize(13);
+  const haloRadius = worldToCanvasSize(150);
   const frameColor = '#000';
   const lightColor = '#FFEA00';
 
