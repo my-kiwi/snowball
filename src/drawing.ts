@@ -112,7 +112,7 @@ const drawStreetlamp = (ctx: CanvasRenderingContext2D, x: number, y: number): vo
 
     // draw the pole
   ctx.fillStyle = frameColor;
-  ctx.fillRect(x - lampWidth / 2, y, lampWidth, lampHeight);
+  ctx.fillRect(x - lampWidth / 2, y, lampWidth, lampHeight/2);
 
   // draw lantern frame
   ctx.strokeStyle = '#000';
@@ -146,7 +146,7 @@ const drawStreetlamp = (ctx: CanvasRenderingContext2D, x: number, y: number): vo
   
   // draw the pole base
   ctx.fillStyle = frameColor;
-  ctx.fillRect(x - lampWidth, y + lampHeight, lampWidth * 2, lampWidth);
+  ctx.fillRect(x - lampWidth, y + lampHeight / 2, lampWidth * 2, lampWidth);
 
   // // draw some light rays
   // ctx.strokeStyle = 'rgba(255, 234, 0, 0.3)';
