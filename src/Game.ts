@@ -34,19 +34,21 @@ const state = {
   }
 };
 
-const updateCatPosition = (): void => {
+const getNextPosition = (currentPos: { x: number, y: number }, speed: number): { x: number; y: number } => {
+  let nextPosX = currentPos.x;
+  let nextPosY = currentPos.y;
   // Move hero based on keyboard input
   if (state.controls.keysPressed.ArrowUp) {
-    state.hero.y -= state.hero.speed;
+    nextPosY -= speed;
   }
   if (state.controls.keysPressed.ArrowDown) {
-    state.hero.y += state.hero.speed;
+    nextPosY += speed;
   }
   if (state.controls.keysPressed.ArrowLeft) {
-    state.hero.x -= state.hero.speed;
+    nextPosX -= speed;
   }
   if (state.controls.keysPressed.ArrowRight) {
-    state.hero.x += state.hero.speed;
+    nextPosX += speed;
   }
 
   // Move hero towards pointer if pointer is down
@@ -57,17 +59,19 @@ const updateCatPosition = (): void => {
     const x = (state.controls.pointer.x - rect.left) * (canvas.clientWidth / rect.width);
     const y = (state.controls.pointer.y - rect.top) * (canvas.clientHeight / rect.height);
 
-    if (state.hero.x < x - state.hero.speed) {
-      state.hero.x += state.hero.speed;
-    } else if (state.hero.x > x + state.hero.speed) {
-      state.hero.x -= state.hero.speed;
+    if (currentPos.x < x - speed) {
+      nextPosX += speed;
+    } else if (currentPos.x > x + speed) {
+      nextPosX -= speed;
     }
-    if (state.hero.y < y - state.hero.speed) {
-      state.hero.y += state.hero.speed;
-    } else if (state.hero.y > y + state.hero.speed) {
-      state.hero.y -= state.hero.speed;
+    if (currentPos.y < y - speed) {
+      nextPosY += speed;
+    } else if (currentPos.y > y + speed) {
+      nextPosY -= speed;
     }
   }
+
+  return { x: nextPosX, y: nextPosY };
 }
 
 const addEventListeners = (): void => {
@@ -117,7 +121,7 @@ const addEventListeners = (): void => {
       state.controls.keysPressed[e.key as keyof typeof state.controls.keysPressed] = false;
     }
   });
-} 
+}
 
 export const startGame = (): void => {
   // Game setup
@@ -175,6 +179,29 @@ const displayHud = (): void => {
   ctx.fillText('Score: 0', 10, 20);
 };
 
+const updateCatPosition = (): void => {
+  const { x: nextPosX, y: nextPosY } = getNextPosition({ x: state.hero.x, y: state.hero.y }, state.hero.speed);
+
+  // check for collisions with walls
+  const matrix = getCurrentLevelMatrix();
+  const cellWidth = canvas.clientWidth / matrix[0].length;
+  const cellHeight = canvas.clientHeight / matrix.length;
+
+  const col = Math.floor(nextPosX / cellWidth);
+  const row = Math.floor(nextPosY / cellHeight);
+
+  if (row >= 0 && row < matrix.length && col >= 0 && col < matrix[0].length) {
+    const tile = matrix[row][col];
+    if (tile !== tileType.wall) {
+      state.hero.x = nextPosX;
+      state.hero.y = nextPosY;
+    }
+  } else {
+    // out of bounds, do not move
+  }
+}
+
+
 const gameLoop = (elapsedTime: number): void => {
   // state updates
   updateCatPosition();
@@ -183,7 +210,7 @@ const gameLoop = (elapsedTime: number): void => {
   clearScreen();
   drawBackground();
   drawCat(ctx, state.hero.x, state.hero.y);
-  
+
   displayHud();
 
   // schedule next frame
