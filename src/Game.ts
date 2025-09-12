@@ -1,10 +1,12 @@
 import { canvas, ctx, worldToCanvasSize } from './canvas';
-import { drawCat, drawBackground } from './drawing';
+import { drawCat, drawBackground, drawEnemy } from './drawing';
 import { getNextLevel, levels, TileChar, tileType } from './levels';
 import { addControlsEventListeners, controls } from './controls';
 
-const START_LEVEL_INDEX = 0; // reset to 0 before pushing to production
+const START_LEVEL_INDEX = 4; // reset to 0 before pushing to production
 const MAX_LIVES = 9;
+const HERO_SPEED = 2.5;
+const ENEMY_SPEED = 3;
 
 const state = {
   bg: {
@@ -15,10 +17,12 @@ const state = {
     x: 100,
     y: 100,
     size: 30,
-    speed: 2.5,
+    speed: HERO_SPEED, // is it changing ever?
     mapPosition: { x: 0, y: 0 },
     lives: MAX_LIVES,
   },
+  streetlamps: [] as { x: number; y: number; size: number }[],
+  ennemies: [] as { x: number; y: number; size: number; speed: number; direction: number, isChasing: boolean }[],
   level: levels[START_LEVEL_INDEX],
 };
 
@@ -63,24 +67,46 @@ const getNextPosition = (currentPos: { x: number, y: number }, speed: number): {
 }
 
 export const startGame = (): void => {
-  // Game setup
+  state.hero.speed = worldToCanvasSize(HERO_SPEED);
   addControlsEventListeners();
-  setHeroStartingPosition();
+  resetActorsPositions();
 
   // Start the game loop
   window.requestAnimationFrame(gameLoop);
 }
 
-const setHeroStartingPosition = (): void => {
+const resetActorsPositions = (): void => {
+// reset enemies and streetlamps arrays
+  state.ennemies = [];
+  state.streetlamps = [];
+
+  const cellWidth = canvas.clientWidth / state.level.map[0].length;
+  const cellHeight = canvas.clientHeight / state.level.map.length;
   // set hero at the tile marked as 'H' in the level map
   for (let row = 0; row < state.level.map.length; row++) {
     for (let col = 0; col < state.level.map[row].length; col++) {
-      if (state.level.map[row][col] === tileType.hero) {
-        const cellWidth = canvas.clientWidth / state.level.map[0].length;
-        const cellHeight = canvas.clientHeight / state.level.map.length;
-        state.hero.x = col * cellWidth + cellWidth / 2;
-        state.hero.y = row * cellHeight + cellHeight / 2;
-        return;
+      switch (state.level.map[row][col]) {
+        case tileType.hero:
+          state.hero.x = col * cellWidth + cellWidth / 2;
+          state.hero.y = row * cellHeight + cellHeight / 2;
+          break;
+        case tileType.streetlamp:
+          state.streetlamps.push({
+            x: col * cellWidth + cellWidth / 2,
+            y: row * cellHeight + cellHeight / 2,
+            size: 50,
+          });
+          break;
+        case tileType.enemy:
+          state.ennemies.push({
+            x: col * cellWidth + cellWidth / 2,
+            y: row * cellHeight + cellHeight / 2,
+            size: 30,
+            speed: worldToCanvasSize(ENEMY_SPEED),
+            direction: Math.random() * 2 * Math.PI,
+            isChasing: false,
+          });
+          break;
       }
     }
   }
@@ -127,14 +153,14 @@ const loseLife = (): void => {
     state.hero.lives = MAX_LIVES;
     state.level = levels[START_LEVEL_INDEX];
   }
-  setHeroStartingPosition();
+  resetActorsPositions();
 }
 
 const goToNextLevel = (): void => {
   const nextLevel = getNextLevel(state.level);
   if (nextLevel) {
     state.level = nextLevel;
-    setHeroStartingPosition();
+    resetActorsPositions();
   } else {
     // no more levels, reset to first level
     // eventually could show a "you win" screen with option to restart
@@ -142,7 +168,7 @@ const goToNextLevel = (): void => {
     // for now just reset to first level
     state.level = levels[START_LEVEL_INDEX];
     state.hero.lives = MAX_LIVES;
-    setHeroStartingPosition();
+    resetActorsPositions();
   }
 }
 
@@ -157,34 +183,79 @@ const checkCollisions = (): void => {
   if (row >= 0 && row < matrix.length && col >= 0 && col < matrix[0].length) {
     const tile = matrix[row][col];
     switch (tile) {
-      case tileType.enemy:
       case tileType.gap:
-       loseLife();
-       break;
+        loseLife();
+        break;
       case tileType.exit:
-       goToNextLevel();
-       break;
+        goToNextLevel();
+        break;
     }
-
     if (state.hero.lives <= 0) {
       // reset game
       state.hero.lives = MAX_LIVES;
       state.level = levels[START_LEVEL_INDEX];
-      setHeroStartingPosition();
+      resetActorsPositions();
     }
   }
+
+  // check if hero is close to a lamp which is close to an enemy
+  state.ennemies.forEach(enemy => {
+    // if enemy is in range of streetlamp, it moves towards the hero
+    state.streetlamps.forEach(lamp => {
+      const dxLamp = enemy.x - lamp.x;
+      const dyLamp = enemy.y - lamp.y;
+      const distanceToLamp = Math.sqrt(dxLamp * dxLamp + dyLamp * dyLamp);
+
+      if (distanceToLamp < worldToCanvasSize(150)) { // lamp influence radius
+        // if hero is also in range of the lamp
+        const dxHero = state.hero.x - lamp.x;
+        const dyHero = state.hero.y - lamp.y;
+        const distanceHeroToLamp = Math.sqrt(dxHero * dxHero + dyHero * dyHero);
+        if (distanceHeroToLamp < worldToCanvasSize(150)) {
+          // enemies chase the hero relentlessly
+          enemy.isChasing = true;
+        }
+      }
+    });
+
+    const dx = enemy.x - state.hero.x;
+    const dy = enemy.y - state.hero.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance < (state.hero.size + enemy.size) / 2) {
+      // collision with enemy
+      loseLife();
+    }
+  });
 }
 
+const updateActorsPositions = (): void => {
+  updateCatPosition();
+
+  // update enemies positions
+  state.ennemies
+  .filter(enemy => enemy.isChasing)
+  .forEach(enemy => {
+    // move enemy towards hero
+    const angleToHero = Math.atan2(state.hero.y - enemy.y, state.hero.x - enemy.x);
+    enemy.direction = angleToHero;
+    enemy.x += Math.cos(enemy.direction) * enemy.speed;
+    enemy.y += Math.sin(enemy.direction) * enemy.speed;
+  });
+}
 
 const gameLoop = (elapsedTime: number): void => {
   // state updates
-  updateCatPosition();
+  updateActorsPositions();
   checkCollisions();
 
   // drawing
   clearScreen();
   drawBackground(state.level.map);
   drawCat(ctx, state.hero.x, state.hero.y);
+  state.ennemies.forEach(enemy => {
+    drawEnemy(ctx, enemy.x, enemy.y);
+  });
 
   displayHud();
 

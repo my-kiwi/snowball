@@ -79,8 +79,7 @@ export const drawTile = (ctx: CanvasRenderingContext2D, tile: TileChar, x: numbe
       // skip as drawn separately
       break;
     case tileType.enemy:
-      ctx.fillStyle = tileTypeToColor[tileType.enemy];
-      ctx.fillRect(x + width * 0.2, y + height * 0.2, width * 0.6, height * 0.6);
+      // skip as drawn separately
       break;
     case tileType.exit:
       drawExit(ctx, x, y, width, height);
@@ -95,6 +94,39 @@ export const drawTile = (ctx: CanvasRenderingContext2D, tile: TileChar, x: numbe
       break;
   }
 
+}
+
+export const drawEnemy = (ctx: CanvasRenderingContext2D, x: number, y: number): void => {
+  // draw ghost shape
+  ctx.fillStyle = 'white';
+  const size = worldToCanvasSize(60);
+  // draw the head
+  ctx.beginPath();
+  ctx.arc(x, y - size * 0.1, size * 0.25, Math.PI, 0); // head
+
+  // determine if we should display the second frame of the wavy bottom, for simple animation
+  const shouldDisplaySecondFrame = Math.floor(Date.now() / 500) % 2 === 1;
+
+  ctx.lineTo(x + size * 0.25, y + size * 0.25);
+  // draw the wavy bottom
+  const waveCount = 9;
+  const waveWidth = (size * 0.5) / waveCount;
+  for (let i = 0; i < waveCount; i++) {
+    const waveX = x + size * 0.25 - i * waveWidth;
+    const isDownPeak = (i % 2 === 0) === shouldDisplaySecondFrame;
+    const waveY = y + size * 0.25 + (isDownPeak ? size * 0.05 : -size * 0.05);
+    ctx.lineTo(waveX, waveY);
+  }
+  ctx.lineTo(x - size * 0.25, y + size * 0.25);
+  ctx.closePath();
+  ctx.fill();
+
+  // draw eyes
+  ctx.fillStyle = 'black';
+  ctx.beginPath();
+  ctx.arc(x - size * 0.07, y - size * 0.05, size * 0.05, 0, Math.PI * 2); // left eye
+  ctx.arc(x + size * 0.07, y - size * 0.05, size * 0.05, 0, Math.PI * 2); // right eye
+  ctx.fill();
 }
 
 const drawExit = (ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number): void => {

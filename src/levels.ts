@@ -134,7 +134,7 @@ export const levels: Level[] = [
 
     },
     {
-        name: 'Level 4: don\'t get we now',
+        name: 'Level 4: don\'t get wet now',
         map: toMatrix(`
 ###########
 #         #
@@ -163,7 +163,37 @@ export const levels: Level[] = [
 #        X#
 ###########
 `)
-
+    },
+    {
+        name: 'Level 5: you can run and you can hide',
+        map: toMatrix(`
+###########
+#         #
+# H       #
+#         #
+#         #
+#         #
+#         #
+#         #
+#         #
+#         #
+#         #
+#         #
+#    O    #
+#         #
+#    E    #
+#         #
+#         #
+#         #
+#         #
+#         #
+#         #
+#         #
+#         #
+#         #
+#        X#
+###########
+`)
     }
 ];
 
