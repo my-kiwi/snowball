@@ -51,16 +51,10 @@ const getNextPosition = (currentPos: { x: number, y: number }, speed: number): {
     const x = (controls.pointer.x - rect.left) * (canvas.clientWidth / rect.width);
     const y = (controls.pointer.y - rect.top) * (canvas.clientHeight / rect.height);
 
-    if (currentPos.x < x - speed) {
-      nextPosX += speed;
-    } else if (currentPos.x > x + speed) {
-      nextPosX -= speed;
-    }
-    if (currentPos.y < y - speed) {
-      nextPosY += speed;
-    } else if (currentPos.y > y + speed) {
-      nextPosY -= speed;
-    }
+    const angleToClick = Math.atan2(y - state.hero.y, x - state.hero.x);
+
+    nextPosX += Math.cos(angleToClick) * state.hero.speed;
+    nextPosY += Math.sin(angleToClick) * state.hero.speed;
   }
 
   return { x: nextPosX, y: nextPosY };
