@@ -1,6 +1,6 @@
 import { canvas, ctx } from './canvas';
 import { drawCat, drawTile } from './drawing';
-import { levels, TileChar, tileType, tileTypeToColor } from './levels';
+import { getNextLevel, levels, TileChar, tileType, tileTypeToColor } from './levels';
 import { addControlsEventListeners, controls } from './controls';
 
 const state = {
@@ -15,10 +15,7 @@ const state = {
     speed: 2.5,
     mapPosition: { x: 0, y: 0 }
   },
-  level: {
-    current: 0,
-    map: levels[0].map
-  }
+  level: levels[0],
 };
 
 const getNextPosition = (currentPos: { x: number, y: number }, speed: number): { x: number; y: number } => {
@@ -109,7 +106,7 @@ const drawBackground = (map: TileChar[][]): void => {
 const displayHud = (): void => {
   ctx.fillStyle = 'white';
   ctx.font = '18px Arial';
-  ctx.fillText('Score: 0', 10, 20);
+  ctx.fillText(state.level.name, 10, 20);
 };
 
 const updateCatPosition = (): void => {
@@ -146,11 +143,7 @@ const checkExitCollision = (): void => {
     const tile = matrix[row][col];
     if (tile === tileType.exit) {
       // Move to next level or restart
-      state.level.current++;
-      if (state.level.current >= levels.length) {
-        state.level.current = 0; // restart from first level for now
-      }
-      state.level.map = levels[state.level.current].map;
+      state.level = getNextLevel(state.level);
       setHeroStartingPosition();
     }
   }

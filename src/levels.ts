@@ -23,9 +23,20 @@ const toMatrix = (mapString: string): TileChar[][] => {
     return mapString.split('\n').slice(1, -1).map(line => line.split('') as unknown as TileChar[]);
 }
 
-export const levels = [
+export const getNextLevel = (currentLevel: Level): Level => {
+    const currentIndex = levels.indexOf(currentLevel);
+    const nextIndex = (currentIndex + 1) % levels.length;
+    return levels[nextIndex];
+}
+
+export type Level = {
+    name: string;
+    map: TileChar[][];
+};
+
+export const levels: Level[] = [
     {
-        name: 'Level 1: basics',
+        name: 'Level 1: easy peasy',
         map: toMatrix(`
 ###########
 #         #
@@ -56,8 +67,8 @@ export const levels = [
 `)
 
     },
-    {
-        name: 'Level 2: walls',
+    {// play on words with maze
+        name: 'Level 2: a-maze-ing',
         map: toMatrix(`
 ###########
 #         #
@@ -80,6 +91,69 @@ export const levels = [
 #         #
 #         #
 #    O    #
+#         #
+#         #
+#         #
+#        X#
+###########
+`)
+
+    },
+{
+        name: 'Level 3: hello darkness',
+        map: toMatrix(`
+###########
+#         #
+#         #
+#    H    #
+#         #
+#######   #      #
+#         #
+#         #
+#   #######
+#         #
+#         #
+#         #
+#    O    #
+#         #
+#         #
+#         #
+####   ####
+#         #
+#         #
+#######   #
+#         #
+#         #
+#   #######
+#         #
+#        X#
+###########
+`)
+
+    },
+    {
+        name: 'Level 4: mind the gap',
+        map: toMatrix(`
+###########
+#         #
+#         #
+#    H    #
+#         #
+#    O    #
+#         #
+#   LLL   #
+#         #
+#         #
+#         #
+#    O    #
+#         #
+#         #
+#         #
+#  ########
+#         #
+#         #
+#         #
+#         #
 #         #
 #         #
 #         #
