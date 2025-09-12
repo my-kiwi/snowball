@@ -74,7 +74,7 @@ export const drawTile = (ctx: CanvasRenderingContext2D, tile: TileChar, x: numbe
       // skip as already drawn by default
       break;
     case tileType.streetlamp:
-      drawStreetlamp(ctx, x + width / 2, y + height / 2);
+      // skip as drawn separately
       break;
     case tileType.hero:
       // skip as drawn separately
@@ -141,7 +141,7 @@ const drawExit = (ctx: CanvasRenderingContext2D, x: number, y: number, width: nu
   // draw the doorknob
   ctx.fillStyle = 'gold';
   ctx.beginPath();
-  ctx.arc(x + width * 0.7, y + height/3, width * 0.05, 0, Math.PI * 2);
+  ctx.arc(x + width * 0.7, y + height / 3, width * 0.05, 0, Math.PI * 2);
   ctx.fill();
 }
 
@@ -150,7 +150,7 @@ const drawGap = (ctx: CanvasRenderingContext2D, x: number, y: number, width: num
   ctx.fillRect(x, y, width, height);
 }
 
-const drawStreetlamp = (ctx: CanvasRenderingContext2D, x: number, y: number): void => {
+export const drawStreetlamp = (x: number, y: number, isOn: boolean): void => {
   // draw the lamp as a lantern shape with light halo
   const lampHeight = worldToCanvasSize(60);
   const lampWidth = worldToCanvasSize(13);
@@ -169,13 +169,15 @@ const drawStreetlamp = (ctx: CanvasRenderingContext2D, x: number, y: number): vo
   ctx.fill();
 
   // draw the light halo
-  const gradient = ctx.createRadialGradient(x, y - lampHeight / 2, lampWidth * 0.5, x, y, haloRadius);
-  gradient.addColorStop(0, 'rgba(255, 234, 0, 0.6)');
-  gradient.addColorStop(1, 'rgba(255, 234, 0, 0)');
-  ctx.fillStyle = gradient;
-  ctx.beginPath();
-  ctx.arc(x, y, haloRadius, 0, Math.PI * 2);
-  ctx.fill();
+  if (isOn) {
+    const gradient = ctx.createRadialGradient(x, y - lampHeight / 2, lampWidth * 0.5, x, y, haloRadius);
+    gradient.addColorStop(0, 'rgba(255, 234, 0, 0.6)');
+    gradient.addColorStop(1, 'rgba(255, 234, 0, 0)');
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(x, y, haloRadius, 0, Math.PI * 2);
+    ctx.fill();
+  }
 
   // draw the pole
   ctx.fillStyle = frameColor;

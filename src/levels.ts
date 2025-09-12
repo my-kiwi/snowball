@@ -2,6 +2,7 @@ export const tileType = {
     wall: '#',
     road: ' ',
     streetlamp: 'O',
+    switchOff: 'S',
     hero: 'H',
     enemy: 'E',
     exit: 'X',
@@ -18,7 +19,8 @@ export const tileTypeToColor = {
     [tileType.hero]: '#00F', // hero
     [tileType.enemy]: '#F00', // enemy
     [tileType.exit]: '#0F0', // exit
-    [tileType.gap]: '#0000FF' // gap
+    [tileType.gap]: '#0000FF', // gap
+    [tileType.switchOff]: '#F00'
 };
 
 const toMatrix = (mapString: string): TileChar[][] => {
@@ -223,6 +225,37 @@ export const levels: Level[] = [
 #       # #
 #   ##### #
 #   #X    #
+###########
+`)
+    },
+       {
+        name: 'Level 7: when the lights go out',
+        map: toMatrix(`
+###########
+#         #
+# H       #
+#         #
+#         #
+#######   #
+#     #   #
+#     #   #
+#     #   #
+#     #   #
+#     #  S#
+#     #   #
+#     #   #
+#     #   #
+#     #   #
+#       E #
+#         #
+#      O  #
+#         #
+#         #
+#         #
+#         #
+#         #
+#         #
+#   X     #
 ###########
 `)
     }

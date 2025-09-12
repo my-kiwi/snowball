@@ -1,5 +1,5 @@
 import { canvas, ctx, worldToCanvasSize } from './canvas';
-import { drawCat, drawBackground, drawEnemy } from './drawing';
+import { drawCat, drawBackground, drawEnemy, drawStreetlamp } from './drawing';
 import { getNextLevel, levels, tileType } from './levels';
 import { addControlsEventListeners, controls } from './controls';
 
@@ -7,6 +7,8 @@ const START_LEVEL_INDEX = 0; // reset to 0 before pushing to production
 const MAX_LIVES = 9;
 const HERO_SPEED = 2.5;
 const ENEMY_SPEED = 3;
+const SWITCH_DELAY = 5000;
+
 export const STREET_LAMP_RADIUS = 130;
 const STREET_LAMP_RADIUS_DETECTION = STREET_LAMP_RADIUS - 10; // slightly smaller so that enemies don't start chasing too early
 
@@ -23,7 +25,7 @@ const state = {
     mapPosition: { x: 0, y: 0 },
     lives: MAX_LIVES,
   },
-  streetlamps: [] as { x: number; y: number; size: number }[],
+  streetlamps: [] as { x: number; y: number; size: number, isOn: boolean }[],
   ennemies: [] as { x: number; y: number; size: number; speed: number; direction: number, isChasing: boolean }[],
   level: levels[START_LEVEL_INDEX],
 };
@@ -72,7 +74,7 @@ export const startGame = (): void => {
 }
 
 const resetActorsPositions = (): void => {
-// reset enemies and streetlamps arrays
+  // reset enemies and streetlamps arrays
   state.ennemies = [];
   state.streetlamps = [];
 
@@ -91,6 +93,7 @@ const resetActorsPositions = (): void => {
             x: col * cellWidth + cellWidth / 2,
             y: row * cellHeight + cellHeight / 2,
             size: 50,
+            isOn: true,
           });
           break;
         case tileType.enemy:
@@ -185,28 +188,38 @@ const checkCollisions = (): void => {
       case tileType.exit:
         goToNextLevel();
         break;
+      case tileType.switchOff:
+        state.streetlamps
+          .filter(l => l.isOn)
+          .forEach(l => {
+            l.isOn = false;
+            setTimeout(() => l.isOn = true, SWITCH_DELAY);
+          });
+        break;
     }
   }
 
   // check if hero is close to a lamp which is close to an enemy
   state.ennemies.forEach(enemy => {
     // if enemy is in range of streetlamp, it moves towards the hero
-    state.streetlamps.forEach(lamp => {
-      const dxLamp = enemy.x - lamp.x;
-      const dyLamp = enemy.y - lamp.y;
-      const distanceToLamp = Math.sqrt(dxLamp * dxLamp + dyLamp * dyLamp);
+    state.streetlamps
+      .filter(lamp => lamp.isOn)
+      .forEach(lamp => {
+        const dxLamp = enemy.x - lamp.x;
+        const dyLamp = enemy.y - lamp.y;
+        const distanceToLamp = Math.sqrt(dxLamp * dxLamp + dyLamp * dyLamp);
 
-      if (distanceToLamp < worldToCanvasSize(STREET_LAMP_RADIUS_DETECTION)) { // lamp influence radius
-        // if hero is also in range of the lamp
-        const dxHero = state.hero.x - lamp.x;
-        const dyHero = state.hero.y - lamp.y;
-        const distanceHeroToLamp = Math.sqrt(dxHero * dxHero + dyHero * dyHero);
-        if (distanceHeroToLamp < worldToCanvasSize(STREET_LAMP_RADIUS_DETECTION)) {
-          // enemies chase the hero relentlessly
-          enemy.isChasing = true;
+        if (distanceToLamp < worldToCanvasSize(STREET_LAMP_RADIUS_DETECTION)) { // lamp influence radius
+          // if hero is also in range of the lamp
+          const dxHero = state.hero.x - lamp.x;
+          const dyHero = state.hero.y - lamp.y;
+          const distanceHeroToLamp = Math.sqrt(dxHero * dxHero + dyHero * dyHero);
+          if (distanceHeroToLamp < worldToCanvasSize(STREET_LAMP_RADIUS_DETECTION)) {
+            // enemies chase the hero relentlessly
+            enemy.isChasing = true;
+          }
         }
-      }
-    });
+      });
 
     const dx = enemy.x - state.hero.x;
     const dy = enemy.y - state.hero.y;
@@ -224,14 +237,14 @@ const updateActorsPositions = (): void => {
 
   // update enemies positions
   state.ennemies
-  .filter(enemy => enemy.isChasing)
-  .forEach(enemy => {
-    // move enemy towards hero
-    const angleToHero = Math.atan2(state.hero.y - enemy.y, state.hero.x - enemy.x);
-    enemy.direction = angleToHero;
-    enemy.x += Math.cos(enemy.direction) * enemy.speed;
-    enemy.y += Math.sin(enemy.direction) * enemy.speed;
-  });
+    .filter(enemy => enemy.isChasing)
+    .forEach(enemy => {
+      // move enemy towards hero
+      const angleToHero = Math.atan2(state.hero.y - enemy.y, state.hero.x - enemy.x);
+      enemy.direction = angleToHero;
+      enemy.x += Math.cos(enemy.direction) * enemy.speed;
+      enemy.y += Math.sin(enemy.direction) * enemy.speed;
+    });
 }
 
 const gameLoop = (elapsedTime: number): void => {
@@ -245,6 +258,9 @@ const gameLoop = (elapsedTime: number): void => {
   drawCat(ctx, state.hero.x, state.hero.y);
   state.ennemies.forEach(enemy => {
     drawEnemy(ctx, enemy.x, enemy.y);
+  });
+  state.streetlamps.forEach(lamp => {
+    drawStreetlamp(lamp.x, lamp.y, lamp.isOn);
   });
 
   displayHud();
