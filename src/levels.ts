@@ -4,7 +4,8 @@ export const tileType = {
     streetlamp: 'O',
     hero: 'H',
     enemy: 'E',
-    exit: 'X'
+    exit: 'X',
+    gap: 'L'
 } as const;
 
 export type TileChar = // value of tileType
@@ -107,7 +108,7 @@ export const levels: Level[] = [
 #         #
 #    H    #
 #         #
-#######   #      #
+#######   #
 #         #
 #         #
 #   #######
@@ -142,6 +143,7 @@ export const levels: Level[] = [
 #    O    #
 #         #
 #   LLL   #
+#         #
 #         #
 #         #
 #         #
