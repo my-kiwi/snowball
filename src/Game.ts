@@ -254,13 +254,12 @@ const gameLoop = (elapsedTime: number): void => {
 
   // drawing
   clearScreen();
-  drawBackground(state.level.map);
+  drawBackground(state.level.map)
+
+  state.streetlamps.forEach(lamp => drawStreetlamp(lamp.x, lamp.y, lamp.isOn)); 
   drawCat(ctx, state.hero.x, state.hero.y);
   state.ennemies.forEach(enemy => {
     drawEnemy(ctx, enemy.x, enemy.y);
-  });
-  state.streetlamps.forEach(lamp => {
-    drawStreetlamp(lamp.x, lamp.y, lamp.isOn);
   });
 
   displayHud();
