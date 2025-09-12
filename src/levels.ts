@@ -169,7 +169,7 @@ export const levels: Level[] = [
         map: toMatrix(`
 ###########
 #         #
-# H       #
+#    H    #
 #         #
 #         #
 #         #
@@ -192,6 +192,37 @@ export const levels: Level[] = [
 #         #
 #         #
 #        X#
+###########
+`)
+    },
+     {
+        name: 'Level 6: slow and steady',
+        map: toMatrix(`
+###########
+#         #
+# H       #
+#         #
+#         #
+#######   #
+#         #
+#         #
+# O       #
+#         #
+#   E     #
+#         #
+#         #
+#    ######
+#         #
+#    E    #
+#         #
+#    O    #
+#         #
+#         #
+#         #
+#       # #
+#       # #
+#   ##### #
+#   #X    #
 ###########
 `)
     }

@@ -1,4 +1,5 @@
 import { worldToCanvasSize, canvas, ctx } from "./canvas";
+import { STREET_LAMP_RADIUS } from "./Game";
 import { tileTypeToColor, TileChar, tileType } from "./levels";
 
 export const drawBackground = (map: TileChar[][]): void => {
@@ -153,7 +154,7 @@ const drawStreetlamp = (ctx: CanvasRenderingContext2D, x: number, y: number): vo
   // draw the lamp as a lantern shape with light halo
   const lampHeight = worldToCanvasSize(60);
   const lampWidth = worldToCanvasSize(13);
-  const haloRadius = worldToCanvasSize(150);
+  const haloRadius = worldToCanvasSize(STREET_LAMP_RADIUS);
   const frameColor = '#000';
   const lightColor = '#FFEA00';
 

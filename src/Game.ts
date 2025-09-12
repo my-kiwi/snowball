@@ -1,12 +1,14 @@
 import { canvas, ctx, worldToCanvasSize } from './canvas';
 import { drawCat, drawBackground, drawEnemy } from './drawing';
-import { getNextLevel, levels, TileChar, tileType } from './levels';
+import { getNextLevel, levels, tileType } from './levels';
 import { addControlsEventListeners, controls } from './controls';
 
 const START_LEVEL_INDEX = 0; // reset to 0 before pushing to production
 const MAX_LIVES = 9;
 const HERO_SPEED = 2.5;
 const ENEMY_SPEED = 3;
+export const STREET_LAMP_RADIUS = 130;
+const STREET_LAMP_RADIUS_DETECTION = STREET_LAMP_RADIUS - 10; // slightly smaller so that enemies don't start chasing too early
 
 const state = {
   bg: {
@@ -194,12 +196,12 @@ const checkCollisions = (): void => {
       const dyLamp = enemy.y - lamp.y;
       const distanceToLamp = Math.sqrt(dxLamp * dxLamp + dyLamp * dyLamp);
 
-      if (distanceToLamp < worldToCanvasSize(150)) { // lamp influence radius
+      if (distanceToLamp < worldToCanvasSize(STREET_LAMP_RADIUS_DETECTION)) { // lamp influence radius
         // if hero is also in range of the lamp
         const dxHero = state.hero.x - lamp.x;
         const dyHero = state.hero.y - lamp.y;
         const distanceHeroToLamp = Math.sqrt(dxHero * dxHero + dyHero * dyHero);
-        if (distanceHeroToLamp < worldToCanvasSize(150)) {
+        if (distanceHeroToLamp < worldToCanvasSize(STREET_LAMP_RADIUS_DETECTION)) {
           // enemies chase the hero relentlessly
           enemy.isChasing = true;
         }
