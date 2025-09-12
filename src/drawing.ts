@@ -85,6 +85,9 @@ export const drawTile = (ctx: CanvasRenderingContext2D, tile: TileChar, x: numbe
     case tileType.exit:
       drawExit(ctx, x, y, width, height);
       break;
+    case tileType.gap:
+      drawGap(ctx, x, y, width, height);
+      break;
     default:
       const color = tileTypeToColor[tile] || 'magenta';
       ctx.fillStyle = color;
@@ -107,6 +110,11 @@ const drawExit = (ctx: CanvasRenderingContext2D, x: number, y: number, width: nu
   ctx.beginPath();
   ctx.arc(x + width * 0.7, y + height/3, width * 0.05, 0, Math.PI * 2);
   ctx.fill();
+}
+
+const drawGap = (ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number): void => {
+  ctx.fillStyle = 'blue';
+  ctx.fillRect(x, y, width, height);
 }
 
 const drawStreetlamp = (ctx: CanvasRenderingContext2D, x: number, y: number): void => {

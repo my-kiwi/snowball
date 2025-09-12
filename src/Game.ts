@@ -3,7 +3,7 @@ import { drawCat, drawBackground } from './drawing';
 import { getNextLevel, levels, TileChar, tileType } from './levels';
 import { addControlsEventListeners, controls } from './controls';
 
-const START_LEVEL_INDEX = 2;
+const START_LEVEL_INDEX = 0; // reset to 0 before pushing to production
 const MAX_LIVES = 9;
 
 const state = {
@@ -137,6 +137,9 @@ const goToNextLevel = (): void => {
     setHeroStartingPosition();
   } else {
     // no more levels, reset to first level
+    // eventually could show a "you win" screen with option to restart
+    // with the score being the number of lives left x 1000 / time taken
+    // for now just reset to first level
     state.level = levels[START_LEVEL_INDEX];
     state.hero.lives = MAX_LIVES;
     setHeroStartingPosition();

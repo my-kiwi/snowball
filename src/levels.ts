@@ -134,16 +134,16 @@ export const levels: Level[] = [
 
     },
     {
-        name: 'Level 4: mind the gap',
+        name: 'Level 4: don\'t get we now',
         map: toMatrix(`
 ###########
 #         #
+# H       #
 #         #
-#    H    #
 #         #
 #    O    #
-#         #
-#   LLL   #
+# LL      #
+#LLLLLL   #
 #         #
 #         #
 #         #
