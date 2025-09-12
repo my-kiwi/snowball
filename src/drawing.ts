@@ -1,5 +1,22 @@
-import { worldToCanvasSize } from "./canvas";
+import { worldToCanvasSize, canvas, ctx } from "./canvas";
 import { tileTypeToColor, TileChar, tileType } from "./levels";
+
+export const drawBackground = (map: TileChar[][]): void => {
+  const cellWidth = canvas.clientWidth / map[0].length;
+  const cellHeight = canvas.clientHeight / map.length;
+
+  // first draw the entire background as road
+  ctx.fillStyle = 'black';
+  ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+
+  // then draw each tile
+  for (let row = 0; row < map.length; row++) {
+    for (let col = 0; col < map[row].length; col++) {
+      const tile = map[row][col];
+      drawTile(ctx, tile, col * cellWidth, row * cellHeight, cellWidth, cellHeight);
+    }
+  }
+};
 
 export const drawCat = (ctx: CanvasRenderingContext2D, x: number, y: number): void => {
   ctx.fillStyle = 'black';
