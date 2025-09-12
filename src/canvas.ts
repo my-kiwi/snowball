@@ -16,6 +16,9 @@ export const initializeCanvas = (): void => {
     canvas.height = canvas.clientHeight * dpr;
 
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // scale the context to account for device pixel ratio
+    /* set autofocus on canvas so arrows are immediately reactive */
+    canvas.setAttribute('tabindex', '0');
+    canvas.focus();
 }
 
 const WORLD_WIDTH = 512;
