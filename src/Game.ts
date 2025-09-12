@@ -184,12 +184,6 @@ const checkCollisions = (): void => {
         goToNextLevel();
         break;
     }
-    if (state.hero.lives <= 0) {
-      // reset game
-      state.hero.lives = MAX_LIVES;
-      state.level = levels[START_LEVEL_INDEX];
-      resetActorsPositions();
-    }
   }
 
   // check if hero is close to a lamp which is close to an enemy
