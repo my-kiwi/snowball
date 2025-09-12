@@ -1,7 +1,10 @@
-import { canvas, ctx } from './canvas';
+import { canvas, ctx, worldToCanvasSize } from './canvas';
 import { drawCat, drawBackground } from './drawing';
-import { getNextLevel, levels, TileChar, tileType, tileTypeToColor } from './levels';
+import { getNextLevel, levels, TileChar, tileType } from './levels';
 import { addControlsEventListeners, controls } from './controls';
+
+const START_LEVEL_INDEX = 2;
+const MAX_LIVES = 9;
 
 const state = {
   bg: {
@@ -13,9 +16,10 @@ const state = {
     y: 100,
     size: 30,
     speed: 2.5,
-    mapPosition: { x: 0, y: 0 }
+    mapPosition: { x: 0, y: 0 },
+    lives: MAX_LIVES,
   },
-  level: levels[0],
+  level: levels[START_LEVEL_INDEX],
 };
 
 const getNextPosition = (currentPos: { x: number, y: number }, speed: number): { x: number; y: number } => {
@@ -88,8 +92,10 @@ const clearScreen = (): void => {
 
 const displayHud = (): void => {
   ctx.fillStyle = 'white';
-  ctx.font = '18px Arial';
-  ctx.fillText(state.level.name, 10, 20);
+  ctx.font = `${worldToCanvasSize(20)}px Arial`;
+  ctx.fillText(state.level.name, worldToCanvasSize(10), worldToCanvasSize(25));
+
+  ctx.fillText(`Lives: ${state.hero.lives}`, canvas.clientWidth - worldToCanvasSize(100), worldToCanvasSize(25));
 };
 
 const updateCatPosition = (): void => {
@@ -114,7 +120,30 @@ const updateCatPosition = (): void => {
   }
 }
 
-const checkExitCollision = (): void => {
+const loseLife = (): void => {
+  state.hero.lives -= 1;
+  if (state.hero.lives <= 0) {
+    // reset game
+    state.hero.lives = MAX_LIVES;
+    state.level = levels[START_LEVEL_INDEX];
+  }
+  setHeroStartingPosition();
+}
+
+const goToNextLevel = (): void => {
+  const nextLevel = getNextLevel(state.level);
+  if (nextLevel) {
+    state.level = nextLevel;
+    setHeroStartingPosition();
+  } else {
+    // no more levels, reset to first level
+    state.level = levels[START_LEVEL_INDEX];
+    state.hero.lives = MAX_LIVES;
+    setHeroStartingPosition();
+  }
+}
+
+const checkCollisions = (): void => {
   const matrix = state.level.map;
   const cellWidth = canvas.clientWidth / matrix[0].length;
   const cellHeight = canvas.clientHeight / matrix.length;
@@ -124,9 +153,20 @@ const checkExitCollision = (): void => {
 
   if (row >= 0 && row < matrix.length && col >= 0 && col < matrix[0].length) {
     const tile = matrix[row][col];
-    if (tile === tileType.exit) {
-      // Move to next level or restart
-      state.level = getNextLevel(state.level);
+    switch (tile) {
+      case tileType.enemy:
+      case tileType.gap:
+       loseLife();
+       break;
+      case tileType.exit:
+       goToNextLevel();
+       break;
+    }
+
+    if (state.hero.lives <= 0) {
+      // reset game
+      state.hero.lives = MAX_LIVES;
+      state.level = levels[START_LEVEL_INDEX];
       setHeroStartingPosition();
     }
   }
@@ -136,7 +176,7 @@ const checkExitCollision = (): void => {
 const gameLoop = (elapsedTime: number): void => {
   // state updates
   updateCatPosition();
-  checkExitCollision();
+  checkCollisions();
 
   // drawing
   clearScreen();

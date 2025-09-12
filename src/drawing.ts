@@ -86,8 +86,8 @@ export const drawTile = (ctx: CanvasRenderingContext2D, tile: TileChar, x: numbe
       drawExit(ctx, x, y, width, height);
       break;
     default:
-      // Unknown tile type
-      ctx.fillStyle = 'magenta';
+      const color = tileTypeToColor[tile] || 'magenta';
+      ctx.fillStyle = color;
       ctx.fillRect(x, y, width, height);
       break;
   }
