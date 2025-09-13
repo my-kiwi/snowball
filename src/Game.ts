@@ -70,7 +70,7 @@ export const startGame = (): void => {
   state.level = levels[START_LEVEL_INDEX];
   state.hero.speed = worldToCanvasSize(HERO_SPEED);
   state.hero.lives = MAX_LIVES;
-  
+
   addControlsEventListeners();
   resetActorsPositions();
 
@@ -88,23 +88,25 @@ const resetActorsPositions = (): void => {
   // set hero at the tile marked as 'H' in the level map
   for (let row = 0; row < state.level.map.length; row++) {
     for (let col = 0; col < state.level.map[row].length; col++) {
+      const x = col * cellWidth + cellWidth / 2;
+      const y = row * cellHeight + cellHeight / 2;
       switch (state.level.map[row][col]) {
         case tileType.hero:
-          state.hero.x = col * cellWidth + cellWidth / 2;
-          state.hero.y = row * cellHeight + cellHeight / 2;
+          state.hero.x = x;
+          state.hero.y = y;
           break;
         case tileType.streetlamp:
           state.streetlamps.push({
-            x: col * cellWidth + cellWidth / 2,
-            y: row * cellHeight + cellHeight / 2,
+            x,
+            y,
             size: 50,
             isOn: true,
           });
           break;
         case tileType.enemy:
           state.ennemies.push({
-            x: col * cellWidth + cellWidth / 2,
-            y: row * cellHeight + cellHeight / 2,
+            x,
+            y,
             size: 30,
             speed: worldToCanvasSize(ENEMY_SPEED),
             direction: Math.random() * 2 * Math.PI,
