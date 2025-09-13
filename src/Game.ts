@@ -67,6 +67,7 @@ const getNextPosition = (currentPos: { x: number, y: number }, speed: number): {
 }
 
 export const startGame = (): void => {
+  state.level = levels[START_LEVEL_INDEX];
   state.hero.speed = worldToCanvasSize(HERO_SPEED);
   addControlsEventListeners();
   resetActorsPositions();
