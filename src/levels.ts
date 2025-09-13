@@ -258,6 +258,38 @@ export const levels: Level[] = [
 #   X     #
 ###########
 `)
+    },
+    {
+        name: 'Level 8: choose wisely',
+         map: toMatrix(`
+###########
+#         #
+# H       #
+#         #
+#    S    #
+#         #
+#  #  LLLL#
+#  #  L X #
+#  #  L   #
+# O#  L O #
+#  #  L   #
+# E#  L E #
+#  #  L   #
+#  #  L   #
+#  #  L   #
+#  #  L   #
+#     L   #
+#  LLLL   #
+#         #
+#         #
+#         #
+#         #
+#         #
+#       S #
+#         #
+###########
+`)
+
     }
 ];
 
