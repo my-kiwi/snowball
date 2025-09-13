@@ -1,3 +1,4 @@
-# snowball
+# Snowball
+Guide Snowball trough the haunted streets of London.
 
-https://my-kiwi.github.io/snowball
+Play: https://my-kiwi.github.io/snowball
