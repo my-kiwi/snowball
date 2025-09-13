@@ -1,5 +1,5 @@
 import { canvas, ctx, worldToCanvasSize } from './canvas';
-import { drawCat, drawBackground, drawEnemy, drawStreetlamp } from './drawing';
+import { drawCat, drawBackground, drawEnemy, drawStreetlamp, drawSwitch } from './drawing';
 import { getNextLevel, levels, tileType } from './levels';
 import { addControlsEventListeners, controls } from './controls';
 
@@ -29,6 +29,7 @@ const state = {
   },
   streetlamps: [] as { x: number; y: number; size: number, isOn: boolean }[],
   ennemies: [] as { x: number; y: number; size: number; speed: number; direction: number, isChasing: boolean }[],
+  switches: [] as { x: number, y: number }[] ,
   level: levels[START_LEVEL_INDEX],
 };
 
@@ -82,6 +83,7 @@ const resetActorsPositions = (): void => {
   // reset enemies and streetlamps arrays
   state.ennemies = [];
   state.streetlamps = [];
+  state.switches = [];
 
   const cellWidth = canvas.clientWidth / state.level.map[0].length;
   const cellHeight = canvas.clientHeight / state.level.map.length;
@@ -112,6 +114,9 @@ const resetActorsPositions = (): void => {
             direction: Math.random() * 2 * Math.PI,
             isChasing: false,
           });
+          break;
+        case tileType.switchOff:
+          state.switches.push({x, y});
           break;
       }
     }
@@ -209,12 +214,15 @@ const checkCollisions = (elapsedTime: number): void => {
         goToNextLevel(elapsedTime);
         break;
       case tileType.switchOff:
-        state.streetlamps
-          .filter(l => l.isOn)
-          .forEach(l => {
-            l.isOn = false;
-            setTimeout(() => l.isOn = true, SWITCH_DELAY);
-          });
+        if (state.switches.length) {
+          state.streetlamps
+            .filter(l => l.isOn)
+            .forEach(l => {
+              l.isOn = false;
+              setTimeout(() => l.isOn = true, SWITCH_DELAY);
+            });
+        }
+        state.switches = []; // only one use per level for now
         break;
     }
   }
@@ -271,12 +279,16 @@ const gameLoop = (elapsedTime: number): void => {
   // state updates
   updateActorsPositions();
   checkCollisions(elapsedTime);
-  if(isWon) return;
+  if (isWon) {
+    // abort looping
+    return;
+  }
 
   // drawing
   clearScreen();
   drawBackground(state.level.map)
-
+  
+  state.switches.forEach(s => drawSwitch(s.x, s.y));
   state.streetlamps.forEach(lamp => drawStreetlamp(lamp.x, lamp.y, lamp.isOn)); 
   drawCat(ctx, state.hero.x, state.hero.y);
   state.ennemies.forEach(enemy => {

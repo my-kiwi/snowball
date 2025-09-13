@@ -82,6 +82,9 @@ export const drawTile = (ctx: CanvasRenderingContext2D, tile: TileChar, x: numbe
     case tileType.enemy:
       // skip as drawn separately
       break;
+    case tileType.switchOff:
+      // skip as drawn separately
+      break;
     case tileType.exit:
       drawExit(ctx, x, y, width, height);
       break;
@@ -95,6 +98,13 @@ export const drawTile = (ctx: CanvasRenderingContext2D, tile: TileChar, x: numbe
       break;
   }
 
+}
+
+export const drawSwitch = (x: number, y: number) => {
+  const color = tileTypeToColor[tileType.switchOff];
+  ctx.fillStyle = color;
+  const size = worldToCanvasSize(30);
+  ctx.fillRect(x - size/2, y - size/2, size, size);
 }
 
 export const drawEnemy = (ctx: CanvasRenderingContext2D, x: number, y: number): void => {
