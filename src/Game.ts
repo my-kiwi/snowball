@@ -3,11 +3,13 @@ import { drawCat, drawBackground, drawEnemy, drawStreetlamp } from './drawing';
 import { getNextLevel, levels, tileType } from './levels';
 import { addControlsEventListeners, controls } from './controls';
 
-const START_LEVEL_INDEX = 0; // reset to 0 before pushing to production
+const START_LEVEL_INDEX = 7; // reset to 0 before pushing to production
 const MAX_LIVES = 9;
 const HERO_SPEED = 2.5;
 const ENEMY_SPEED = 3;
 const SWITCH_DELAY = 5000;
+
+let isWon = false;
 
 export const STREET_LAMP_RADIUS = 130;
 const STREET_LAMP_RADIUS_DETECTION = STREET_LAMP_RADIUS - 10; // slightly smaller so that enemies don't start chasing too early
@@ -155,7 +157,7 @@ const loseLife = (): void => {
   resetActorsPositions();
 }
 
-const goToNextLevel = (): void => {
+const goToNextLevel = (elapsedTime: number): void => {
   const nextLevel = getNextLevel(state.level);
   if (nextLevel) {
     state.level = nextLevel;
@@ -165,13 +167,26 @@ const goToNextLevel = (): void => {
     // eventually could show a "you win" screen with option to restart
     // with the score being the number of lives left x 1000 / time taken
     // for now just reset to first level
-    state.level = levels[START_LEVEL_INDEX];
-    state.hero.lives = MAX_LIVES;
+    console.log('won');
+    isWon = true;
+    
+    ctx.fillStyle = 'yellow';
+    ctx.font = '34px Arial';
     resetActorsPositions();
+
+    ctx.fillText(`You won! Time: ${Math.floor(elapsedTime/1000)} s`, 50, canvas.clientHeight / 2);
+    
+    ctx.fillText('click to restart', 50, (canvas.clientHeight / 2) + 34);
+    const retry = () => {
+      window.removeEventListener('pointerdown', retry);
+      isWon = false;
+      startGame();
+    }
+    window.addEventListener('pointerdown', retry);
   }
 }
 
-const checkCollisions = (): void => {
+const checkCollisions = (elapsedTime: number): void => {
   const matrix = state.level.map;
   const cellWidth = canvas.clientWidth / matrix[0].length;
   const cellHeight = canvas.clientHeight / matrix.length;
@@ -186,7 +201,7 @@ const checkCollisions = (): void => {
         loseLife();
         break;
       case tileType.exit:
-        goToNextLevel();
+        goToNextLevel(elapsedTime);
         break;
       case tileType.switchOff:
         state.streetlamps
@@ -250,7 +265,8 @@ const updateActorsPositions = (): void => {
 const gameLoop = (elapsedTime: number): void => {
   // state updates
   updateActorsPositions();
-  checkCollisions();
+  checkCollisions(elapsedTime);
+  if(isWon) return;
 
   // drawing
   clearScreen();
