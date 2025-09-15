@@ -15,16 +15,11 @@ export const STREET_LAMP_RADIUS = 130;
 const STREET_LAMP_RADIUS_DETECTION = STREET_LAMP_RADIUS - 10; // slightly smaller so that enemies don't start chasing too early
 
 const state = {
-  bg: {
-    x: 0,
-    y: 0,
-  },
   hero: {
     x: 100,
     y: 100,
     size: 30,
     speed: HERO_SPEED, // is it changing ever?
-    mapPosition: { x: 0, y: 0 },
     lives: MAX_LIVES,
   },
   streetlamps: [] as { x: number; y: number; size: number, isOn: boolean }[],
