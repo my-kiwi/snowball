@@ -297,10 +297,3 @@ const gameLoop = (elapsedTime: number): void => {
 
   // displayDebugInfo(elapsedTime);
 }
-
-const displayDebugInfo = (elapsedTime: number): void => {
-  ctx.fillStyle = 'yellow';
-  ctx.font = '14px Arial';
-  ctx.fillText(`Elapsed Time: ${Math.floor(elapsedTime)} ms`, 10, canvas.clientHeight - 40);
-  ctx.fillText(`Hero Position: (${state.hero.x}, ${state.hero.y})`, 10, canvas.clientHeight - 20);
-}
