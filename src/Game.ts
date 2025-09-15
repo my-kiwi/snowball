@@ -168,11 +168,6 @@ const goToNextLevel = (elapsedTime: number): void => {
     state.level = nextLevel;
     resetActorsPositions();
   } else {
-    // no more levels, reset to first level
-    // eventually could show a "you win" screen with option to restart
-    // with the score being the number of lives left x 1000 / time taken
-    // for now just reset to first level
-    console.log('won');
     isWon = true;
     
     ctx.fillStyle = 'yellow';
