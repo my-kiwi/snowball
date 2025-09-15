@@ -294,6 +294,4 @@ const gameLoop = (elapsedTime: number): void => {
 
   // schedule next frame
   window.requestAnimationFrame(gameLoop);
-
-  // displayDebugInfo(elapsedTime);
 }
