@@ -101,11 +101,34 @@ export const drawTile = (ctx: CanvasRenderingContext2D, tile: TileChar, x: numbe
 }
 
 export const drawSwitch = (x: number, y: number) => {
-  const color = tileTypeToColor[tileType.switchOff];
-  ctx.fillStyle = color;
-  const size = worldToCanvasSize(30);
-  ctx.fillRect(x - size/2, y - size/2, size, size);
-}
+  const width = worldToCanvasSize(30);
+  const height = worldToCanvasSize(30);
+
+  ctx.fillStyle = '#FF4444';
+  ctx.fillRect(x - width / 2, y - height / 2, width, height);
+
+  ctx.strokeStyle = '#FFFFFF';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x - width / 2, y - height / 2, width, height);
+
+  // ⚡ Lightning bolt icon
+  const boltSize = worldToCanvasSize(20); // scale of the bolt
+  ctx.beginPath();
+  ctx.fillStyle = '#FFD700'; // yellow
+
+  ctx.moveTo(x + boltSize * 0.3, y - boltSize * 0.5); // top right
+  ctx.lineTo(x - boltSize * 0.4, y + boltSize * 0.1); // mid left
+  ctx.lineTo(x - boltSize * 0.1, y + boltSize * 0.1); // inner mid left
+
+  ctx.lineTo(x - boltSize * 0.3, y + boltSize * 0.5); // bottom left
+  ctx.lineTo(x + boltSize * 0.4, y - boltSize * 0.1); // mid right
+  ctx.lineTo(x + boltSize * 0.1, y - boltSize * 0.1); // inner mid right
+
+  ctx.closePath();
+  ctx.fill();
+};
+
+
 
 export const drawEnemy = (ctx: CanvasRenderingContext2D, x: number, y: number): void => {
   // draw ghost shape
