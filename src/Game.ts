@@ -4,7 +4,7 @@ import { getNextLevel, levels, tileType } from './levels';
 import { addControlsEventListeners, controls } from './controls';
 import { StreetLamp, Enemy, Switch, Position, Hero } from './types';
 
-const START_LEVEL_INDEX = 8; // reset to 0 before pushing to production
+const START_LEVEL_INDEX = 0; // reset to 0 before pushing to production
 const MAX_LIVES = 9;
 const HERO_SPEED = 2.5;
 const ENEMY_SPEED = 3;
