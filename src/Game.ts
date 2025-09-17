@@ -6,8 +6,8 @@ import { StreetLamp, Enemy, Switch, Position, Hero } from './types';
 
 const START_LEVEL_INDEX = 0; // reset to 0 before pushing to production
 const MAX_LIVES = 9;
-const HERO_SPEED = 2.5;
-const ENEMY_SPEED = 3;
+const HERO_SPEED = 250;
+const ENEMY_SPEED = 300;
 const SWITCH_DELAY = 5000;
 export const STREET_LAMP_RADIUS = 130;
 const STREET_LAMP_RADIUS_DETECTION = STREET_LAMP_RADIUS - 10; // slightly smaller so that enemies don't start chasing too early
@@ -24,7 +24,7 @@ const state = {
   } as Hero,
   streetlamps: [] as StreetLamp[],
   ennemies: [] as Enemy[],
-  switches: [] as Switch[] ,
+  switches: [] as Switch[],
   level: levels[START_LEVEL_INDEX],
 };
 
@@ -53,10 +53,10 @@ const getNextPosition = (currentPos: Position, speed: number): Position => {
     const x = (controls.pointer.x - rect.left) * (canvas.clientWidth / rect.width);
     const y = (controls.pointer.y - rect.top) * (canvas.clientHeight / rect.height);
 
-    const angleToClick = Math.atan2(y - state.hero.y, x - state.hero.x);
+    const angleToClick = Math.atan2(y - nextPosY, x - nextPosX);
 
-    nextPosX += Math.cos(angleToClick) * state.hero.speed;
-    nextPosY += Math.sin(angleToClick) * state.hero.speed;
+    nextPosX += Math.cos(angleToClick) * speed;
+    nextPosY += Math.sin(angleToClick) * speed;
   }
 
   return { x: nextPosX, y: nextPosY };
@@ -112,7 +112,7 @@ const resetActorsPositions = (): void => {
           });
           break;
         case tileType.switchOff:
-          state.switches.push({x, y});
+          state.switches.push({ x, y });
           break;
       }
     }
@@ -131,8 +131,11 @@ const displayHud = (): void => {
   ctx.fillText(`Lives: ${state.hero.lives}`, canvas.clientWidth - worldToCanvasSize(100), worldToCanvasSize(25));
 };
 
-const updateCatPosition = (): void => {
-  const { x: nextPosX, y: nextPosY } = getNextPosition({ x: state.hero.x, y: state.hero.y }, state.hero.speed);
+const updateCatPosition = (deltaTime: number): void => {
+  const { x: nextPosX, y: nextPosY } = getNextPosition(
+    { x: state.hero.x, y: state.hero.y },
+    state.hero.speed * deltaTime // decouple speed from refresh rate
+  );
 
   // check for collisions with walls
   const matrix = state.level.map;
@@ -163,15 +166,15 @@ const loseLife = (): void => {
   resetActorsPositions();
 }
 
-const goToNextLevel = (): {isGameOver: boolean} => {
+const goToNextLevel = (): { isGameOver: boolean } => {
   const nextLevel = getNextLevel(state.level);
   if (nextLevel) {
     state.level = nextLevel;
     resetActorsPositions();
-    return {isGameOver: false};
+    return { isGameOver: false };
   } else {
     showGameOverScreen();
-    return {isGameOver: true};
+    return { isGameOver: true };
   }
 }
 
@@ -181,8 +184,8 @@ const showGameOverScreen = () => {
   resetActorsPositions();
   const elapsedTime = Date.now() - state.startTime;
 
-  ctx.fillText(`You won! Time: ${Math.floor(elapsedTime/1000)} s`, 50, canvas.clientHeight / 2);
-  
+  ctx.fillText(`You won! Time: ${Math.floor(elapsedTime / 1000)} s`, 50, canvas.clientHeight / 2);
+
   ctx.fillText('click to restart', 50, (canvas.clientHeight / 2) + 34);
   const retry = () => {
     window.removeEventListener('pointerdown', retry);
@@ -191,7 +194,7 @@ const showGameOverScreen = () => {
   window.addEventListener('pointerdown', retry);
 }
 
-const checkCollisions = (): {isGameOver: boolean} => {
+const checkCollisions = (): { isGameOver: boolean } => {
   const matrix = state.level.map;
   const cellWidth = canvas.clientWidth / matrix[0].length;
   const cellHeight = canvas.clientHeight / matrix.length;
@@ -255,24 +258,30 @@ const checkCollisions = (): {isGameOver: boolean} => {
   return { isGameOver: false };
 }
 
-const updateActorsPositions = (): void => {
-  updateCatPosition();
+const updateActorsPositions = (deltaTime: number): void => {
+  updateCatPosition(deltaTime);
 
   // update enemies positions
   state.ennemies
     .filter(enemy => enemy.isChasing)
     .forEach(enemy => {
+      const speed = enemy.speed * deltaTime  // decouple speed from refresh rate
       // move enemy towards hero
       const angleToHero = Math.atan2(state.hero.y - enemy.y, state.hero.x - enemy.x);
       enemy.direction = angleToHero;
-      enemy.x += Math.cos(enemy.direction) * enemy.speed;
-      enemy.y += Math.sin(enemy.direction) * enemy.speed;
+      enemy.x += Math.cos(enemy.direction) * speed;
+      enemy.y += Math.sin(enemy.direction) * speed;
     });
 }
 
-const gameLoop = (): void => {
+let lastTime = performance.now();
+
+const gameLoop = (currentTime: number): void => {
+  const deltaTime = (currentTime - lastTime) / 1000; // convert to seconds for convenience
+  lastTime = currentTime;
+
   // state updates
-  updateActorsPositions();
+  updateActorsPositions(deltaTime);
   const { isGameOver } = checkCollisions();
   if (isGameOver) {
     // abort loop
@@ -282,9 +291,9 @@ const gameLoop = (): void => {
   // drawing
   clearScreen();
   drawBackground(state.level.map)
-  
+
   state.switches.forEach(s => drawSwitch(s.x, s.y));
-  state.streetlamps.forEach(lamp => drawStreetlamp(lamp.x, lamp.y, lamp.isOn)); 
+  state.streetlamps.forEach(lamp => drawStreetlamp(lamp.x, lamp.y, lamp.isOn));
   drawCat(ctx, state.hero.x, state.hero.y);
   state.ennemies.forEach(enemy => {
     drawEnemy(ctx, enemy.x, enemy.y);
