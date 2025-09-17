@@ -2,8 +2,9 @@ import { canvas, ctx, worldToCanvasSize } from './canvas';
 import { drawCat, drawBackground, drawEnemy, drawStreetlamp, drawSwitch } from './drawing';
 import { getNextLevel, levels, tileType } from './levels';
 import { addControlsEventListeners, controls } from './controls';
+import { StreetLamp, Enemy, Switch, Position, Hero } from './types';
 
-const START_LEVEL_INDEX = 0; // reset to 0 before pushing to production
+const START_LEVEL_INDEX = 8; // reset to 0 before pushing to production
 const MAX_LIVES = 9;
 const HERO_SPEED = 2.5;
 const ENEMY_SPEED = 3;
@@ -11,22 +12,23 @@ const SWITCH_DELAY = 5000;
 export const STREET_LAMP_RADIUS = 130;
 const STREET_LAMP_RADIUS_DETECTION = STREET_LAMP_RADIUS - 10; // slightly smaller so that enemies don't start chasing too early
 
+
 const state = {
   startTime: Date.now(),
   hero: {
     x: 100,
     y: 100,
     size: 30,
-    speed: HERO_SPEED, // is it changing ever?
+    speed: HERO_SPEED,
     lives: MAX_LIVES,
-  },
-  streetlamps: [] as { x: number; y: number; size: number, isOn: boolean }[],
-  ennemies: [] as { x: number; y: number; size: number; speed: number; direction: number, isChasing: boolean }[],
-  switches: [] as { x: number, y: number }[] ,
+  } as Hero,
+  streetlamps: [] as StreetLamp[],
+  ennemies: [] as Enemy[],
+  switches: [] as Switch[] ,
   level: levels[START_LEVEL_INDEX],
 };
 
-const getNextPosition = (currentPos: { x: number, y: number }, speed: number): { x: number; y: number } => {
+const getNextPosition = (currentPos: Position, speed: number): Position => {
   let nextPosX = currentPos.x;
   let nextPosY = currentPos.y;
   // Move hero based on keyboard input
